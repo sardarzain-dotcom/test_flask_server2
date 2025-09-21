@@ -1,0 +1,68 @@
+# Git files
+.git
+.gitignore
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Documentation (keep README.md but exclude others)
+*.md
+!README.md
+
+# GitHub Actions (already deployed, no need to upload)
+.github/
+
+# Local development files
+secret-content.json
+*.local
+.cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Test files (optional - uncomment if you don't want to deploy tests)
+# test_*.py
+# *_test.py
+# tests/
+
+# Chess specific - keep only necessary files
+# (All your chess files are needed for the game to work)
