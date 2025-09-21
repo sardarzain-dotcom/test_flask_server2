@@ -34,11 +34,20 @@ jobs:
 
     - name: Verify Authentication
       run: |
+        echo "🔐 Authenticating with Google Cloud..."
         gcloud auth list
         gcloud config list
-        echo "Project: ${{ env.PROJECT_ID }}"
-        echo "Service: ${{ env.SERVICE }}"
-        echo "Region: ${{ env.REGION }}"
+        echo "📋 Configuration:"
+        echo "  Project: ${{ env.PROJECT_ID }}"
+        echo "  Service: ${{ env.SERVICE }}"
+        echo "  Region: ${{ env.REGION }}"
+
+    - name: Enable required APIs
+      run: |
+        echo "🔧 Enabling required Google Cloud APIs..."
+        gcloud services enable run.googleapis.com
+        gcloud services enable cloudbuild.googleapis.com
+        gcloud services enable artifactregistry.googleapis.com
 
     - name: Deploy to Cloud Run
       run: |
@@ -47,17 +56,35 @@ jobs:
           --platform managed \
           --region ${{ env.REGION }} \
           --allow-unauthenticated \
-          --port 8000 \
+          --port 8080 \
           --memory 1Gi \
           --cpu 1 \
           --max-instances 10 \
           --timeout 300s \
-          --project ${{ env.PROJECT_ID }}
+          --project ${{ env.PROJECT_ID }} \
+          --quiet
 
-    - name: Get Service URL
+    - name: Get Service URL and Test
       run: |
+        echo "🌐 Getting service URL..."
         SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} --format='value(status.url)')
+        
+        if [ -z "$SERVICE_URL" ]; then
+          echo "❌ Failed to get service URL"
+          exit 1
+        fi
+        
         echo "✅ Service deployed successfully!"
         echo "🌐 Main URL: $SERVICE_URL"
         echo "♟️  Chess Game: $SERVICE_URL/chess"
-        echo "::notice title=Deployment Success::Chess game deployed to $SERVICE_URL/chess"
+        echo "🔍 Health Check: $SERVICE_URL/api/health"
+        
+        # Test the deployment
+        echo "🧪 Testing deployment..."
+        if curl -f -s "$SERVICE_URL/api/health" > /dev/null; then
+          echo "✅ Health check passed!"
+          echo "::notice title=Deployment Success::Chess game deployed successfully to $SERVICE_URL/chess"
+        else
+          echo "⚠️  Health check failed, but service is deployed"
+          echo "::warning title=Health Check::Service deployed but health check failed"
+        fi

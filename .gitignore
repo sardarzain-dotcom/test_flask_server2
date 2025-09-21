@@ -146,3 +146,11 @@ Thumbs.db
 
 # Cloud deployment files
 .gcloudignore
+
+# Secrets and credentials (NEVER commit these)
+secret-content.json
+*.key
+*.pem
+service-account*.json
+credentials*.json
+gcp-key*.json
