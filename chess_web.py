@@ -38,8 +38,8 @@ CHESS_TEMPLATE = """
         
         .chess-board { 
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
             width: 480px;
             height: 480px;
             border: 4px solid #8b4513;
@@ -47,6 +47,7 @@ CHESS_TEMPLATE = """
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             background: #f0d9b5;
             position: relative;
+            gap: 0;
         }
         
         .chess-square {
@@ -100,6 +101,14 @@ CHESS_TEMPLATE = """
         .chess-piece {
             cursor: grab;
             transition: all 0.2s ease;
+            font-size: 36px;
+            line-height: 1;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .chess-piece:hover {
@@ -307,8 +316,8 @@ CHESS_TEMPLATE = """
         
         // Piece symbols mapping
         const pieceSymbols = {
-            'white': { 'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔' },
-            'black': { 'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚' }
+            'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',  // White pieces
+            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'   // Black pieces
         };
         
         // Initialize the chess board
@@ -324,7 +333,7 @@ CHESS_TEMPLATE = """
                     square.dataset.col = col;
                     square.dataset.square = String.fromCharCode(97 + col) + (8 - row);
                     
-                    // Add piece if present - fix null handling
+                    // Add piece if present
                     if (gameState && gameState[row] && gameState[row][col]) {
                         const piece = gameState[row][col];
                         const pieceElement = document.createElement('span');
@@ -343,8 +352,7 @@ CHESS_TEMPLATE = """
         
         // Get Unicode symbol for piece
         function getPieceSymbol(piece) {
-            const color = piece === piece.toUpperCase() ? 'white' : 'black';
-            return pieceSymbols[color][piece.toUpperCase()] || piece;
+            return pieceSymbols[piece] || piece;
         }
         
         // Handle square click
