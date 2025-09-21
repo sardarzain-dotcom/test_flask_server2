@@ -9,8 +9,7 @@ env:
   PROJECT_ID: bamboo-strata-274419
   SERVICE: testflaskserver2
   REGION: us-central1
-  REGISTRY: us-central1-docker.pkg.dev
-  REPOSITORY: chess-repo
+  REGISTRY: gcr.io
 
 jobs:
   deploy:
@@ -34,28 +33,20 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: Configure Docker for Artifact Registry
+    - name: Configure Docker for GCR
       run: |
-        echo "� Configuring Docker for Artifact Registry..."
-        gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
-
-    - name: Create Artifact Registry Repository (if needed)
-      run: |
-        echo "� Ensuring Artifact Registry repository exists..."
-        gcloud artifacts repositories create ${{ env.REPOSITORY }} \
-          --repository-format=docker \
-          --location=${{ env.REGION }} \
-          --project=${{ env.PROJECT_ID }} || echo "Repository already exists"
+        echo "🔧 Configuring Docker for Google Container Registry..."
+        gcloud auth configure-docker --quiet
 
     - name: Build and Push Container Image
       run: |
         echo "🔨 Building container image..."
-        IMAGE_URI="${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
+        IMAGE_URI="${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
         
         # Build the Docker image
         docker build -t $IMAGE_URI .
         
-        echo "📤 Pushing image to Artifact Registry..."
+        echo "📤 Pushing image to Google Container Registry..."
         docker push $IMAGE_URI
         
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
@@ -78,31 +69,6 @@ jobs:
           --project ${{ env.PROJECT_ID }} \
           --execution-environment gen2 \
           --quiet
-
-    - name: Get Service URL and Test
-      run: |
-        echo "🌐 Getting service URL..."
-        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} --format='value(status.url)')
-        
-        if [ -z "$SERVICE_URL" ]; then
-          echo "❌ Failed to get service URL"
-          exit 1
-        fi
-        
-        echo "✅ Service deployed successfully!"
-        echo "🌐 Main URL: $SERVICE_URL"
-        echo "♟️  Chess Game: $SERVICE_URL/chess"
-        echo "🔍 Health Check: $SERVICE_URL/api/health"
-        
-        # Test the deployment
-        echo "🧪 Testing deployment..."
-        if curl -f -s "$SERVICE_URL/api/health" > /dev/null; then
-          echo "✅ Health check passed!"
-          echo "::notice title=Deployment Success::Chess game deployed successfully to $SERVICE_URL/chess"
-        else
-          echo "⚠️  Health check failed, but service is deployed"
-          echo "::warning title=Health Check::Service deployed but health check failed"
-        fi
 
     - name: Get Service URL and Test
       run: |
