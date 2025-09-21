@@ -42,31 +42,13 @@ jobs:
         echo "  Service: ${{ env.SERVICE }}"
         echo "  Region: ${{ env.REGION }}"
 
-    - name: Verify APIs and Permissions
+    - name: Deploy to Cloud Run
       run: |
-        echo "� Checking Google Cloud setup..."
-        echo "Project: ${{ env.PROJECT_ID }}"
-        echo "Service Account: github-actions@bamboo-strata-274419.iam.gserviceaccount.com"
-        
-        # List current project info
-        gcloud config get-value project
-        gcloud auth list --filter=status:ACTIVE --format="table(account)"
-        
-        # Check if required APIs are enabled (don't try to enable them)
-        echo "� Checking API status..."
-        gcloud services list --enabled --filter="name:(run.googleapis.com OR cloudbuild.googleapis.com OR artifactregistry.googleapis.com)" --format="table(name,title)" || echo "⚠️  Could not check API status"
-
-    - name: Build and Deploy to Cloud Run
-      run: |
-        echo "� Building and deploying to Cloud Run..."
-        
-        # Use gcloud builds submit instead of --source to have more control
-        echo "📦 Building container image..."
-        gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }} .
-        
         echo "🚀 Deploying to Cloud Run..."
+        
+        # Deploy directly with Dockerfile (avoid Cloud Build issues)
         gcloud run deploy ${{ env.SERVICE }} \
-          --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }} \
+          --source . \
           --platform managed \
           --region ${{ env.REGION }} \
           --allow-unauthenticated \
@@ -76,6 +58,7 @@ jobs:
           --max-instances 10 \
           --timeout 300s \
           --project ${{ env.PROJECT_ID }} \
+          --execution-environment gen2 \
           --quiet
 
     - name: Get Service URL and Test
