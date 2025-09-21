@@ -61,6 +61,7 @@ CHESS_TEMPLATE = """
             transition: all 0.2s ease;
             position: relative;
             user-select: none;
+            box-sizing: border-box;
         }
         
         .chess-square.light {
@@ -246,12 +247,23 @@ CHESS_TEMPLATE = """
             
             <!-- Board coordinates -->
             <div class="board-coordinates">
-                {% for file in 'abcdefgh' %}
-                <div class="coord-file" style="left: {{ loop.index0 * 60 + 4 }}px;">{{ file }}</div>
-                {% endfor %}
-                {% for rank in range(8, 0, -1) %}
-                <div class="coord-rank" style="top: {{ (8 - rank) * 60 + 4 }}px;">{{ rank }}</div>
-                {% endfor %}
+                <div class="coord-file" style="left: 4px;">a</div>
+                <div class="coord-file" style="left: 64px;">b</div>
+                <div class="coord-file" style="left: 124px;">c</div>
+                <div class="coord-file" style="left: 184px;">d</div>
+                <div class="coord-file" style="left: 244px;">e</div>
+                <div class="coord-file" style="left: 304px;">f</div>
+                <div class="coord-file" style="left: 364px;">g</div>
+                <div class="coord-file" style="left: 424px;">h</div>
+                
+                <div class="coord-rank" style="top: 4px;">8</div>
+                <div class="coord-rank" style="top: 64px;">7</div>
+                <div class="coord-rank" style="top: 124px;">6</div>
+                <div class="coord-rank" style="top: 184px;">5</div>
+                <div class="coord-rank" style="top: 244px;">4</div>
+                <div class="coord-rank" style="top: 304px;">3</div>
+                <div class="coord-rank" style="top: 364px;">2</div>
+                <div class="coord-rank" style="top: 424px;">1</div>
             </div>
         </div>
         
@@ -289,6 +301,10 @@ CHESS_TEMPLATE = """
         let selectedSquare = null;
         let currentPlayer = '{{ current_player }}';
         
+        // Debug: Log initial game state
+        console.log('Initial game state:', gameState);
+        console.log('Current player:', currentPlayer);
+        
         // Piece symbols mapping
         const pieceSymbols = {
             'white': { 'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔' },
@@ -308,9 +324,9 @@ CHESS_TEMPLATE = """
                     square.dataset.col = col;
                     square.dataset.square = String.fromCharCode(97 + col) + (8 - row);
                     
-                    // Add piece if present
-                    const piece = gameState[row][col];
-                    if (piece) {
+                    // Add piece if present - fix null handling
+                    if (gameState && gameState[row] && gameState[row][col]) {
+                        const piece = gameState[row][col];
                         const pieceElement = document.createElement('span');
                         pieceElement.className = 'chess-piece';
                         pieceElement.textContent = getPieceSymbol(piece);
@@ -340,11 +356,13 @@ CHESS_TEMPLATE = """
             
             if (selectedSquare === null) {
                 // Select piece if there's one and it belongs to current player
-                const piece = gameState[row][col];
-                if (piece && isCurrentPlayerPiece(piece)) {
-                    selectSquare(square);
-                    selectedSquare = { row, col, square: squareName };
-                    document.getElementById('selected-square').textContent = squareName;
+                if (gameState && gameState[row] && gameState[row][col]) {
+                    const piece = gameState[row][col];
+                    if (isCurrentPlayerPiece(piece)) {
+                        selectSquare(square);
+                        selectedSquare = { row, col, square: squareName };
+                        document.getElementById('selected-square').textContent = squareName;
+                    }
                 }
             } else {
                 // Make move
@@ -390,6 +408,8 @@ CHESS_TEMPLATE = """
         
         // Make move via AJAX
         function makeMove(from, to) {
+            console.log('Making move:', from, 'to', to);
+            
             fetch('/chess/move', {
                 method: 'POST',
                 headers: {
@@ -400,8 +420,14 @@ CHESS_TEMPLATE = """
                     to_pos: to
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Move response:', data);
                 if (data.success) {
                     gameState = data.board_data;
                     currentPlayer = data.current_player;
@@ -416,7 +442,7 @@ CHESS_TEMPLATE = """
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('Network error occurred', 'error');
+                showMessage('Network error occurred: ' + error.message, 'error');
                 deselectSquare();
             });
         }
@@ -470,27 +496,32 @@ def add_chess_routes(app):
     
     def get_board_data():
         """Convert board to 2D array for JavaScript"""
-        board_data = []
-        for row in range(8):
-            board_row = []
-            for col in range(8):
-                piece = chess_game.board.board[row][col]
-                if piece:
-                    # Convert piece to simple character representation
-                    symbols = {
-                        PieceType.PAWN: 'P',
-                        PieceType.ROOK: 'R',
-                        PieceType.KNIGHT: 'N',
-                        PieceType.BISHOP: 'B',
-                        PieceType.QUEEN: 'Q',
-                        PieceType.KING: 'K'
-                    }
-                    symbol = symbols.get(piece.piece_type, '?')
-                    board_row.append(symbol if piece.color == Color.WHITE else symbol.lower())
-                else:
-                    board_row.append(None)
-            board_data.append(board_row)
-        return board_data
+        try:
+            board_data = []
+            for row in range(8):
+                board_row = []
+                for col in range(8):
+                    piece = chess_game.board.board[row][col]
+                    if piece:
+                        # Convert piece to simple character representation
+                        symbols = {
+                            PieceType.PAWN: 'P',
+                            PieceType.ROOK: 'R',
+                            PieceType.KNIGHT: 'N',
+                            PieceType.BISHOP: 'B',
+                            PieceType.QUEEN: 'Q',
+                            PieceType.KING: 'K'
+                        }
+                        symbol = symbols.get(piece.piece_type, '?')
+                        board_row.append(symbol if piece.color == Color.WHITE else symbol.lower())
+                    else:
+                        board_row.append(None)
+                board_data.append(board_row)
+            return board_data
+        except Exception as e:
+            print(f"Error generating board data: {e}")
+            # Return empty 8x8 board as fallback
+            return [[None for _ in range(8)] for _ in range(8)]
     
     @app.route('/chess')
     def chess_game_page():
