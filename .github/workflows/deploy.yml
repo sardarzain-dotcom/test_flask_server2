@@ -42,12 +42,19 @@ jobs:
         echo "  Service: ${{ env.SERVICE }}"
         echo "  Region: ${{ env.REGION }}"
 
-    - name: Enable required APIs
+    - name: Verify APIs and Permissions
       run: |
-        echo "🔧 Enabling required Google Cloud APIs..."
-        gcloud services enable run.googleapis.com
-        gcloud services enable cloudbuild.googleapis.com
-        gcloud services enable artifactregistry.googleapis.com
+        echo "� Checking Google Cloud setup..."
+        echo "Project: ${{ env.PROJECT_ID }}"
+        echo "Service Account: github-actions@bamboo-strata-274419.iam.gserviceaccount.com"
+        
+        # List current project info
+        gcloud config get-value project
+        gcloud auth list --filter=status:ACTIVE --format="table(account)"
+        
+        # Check if required APIs are enabled (don't try to enable them)
+        echo "� Checking API status..."
+        gcloud services list --enabled --filter="name:(run.googleapis.com OR cloudbuild.googleapis.com OR artifactregistry.googleapis.com)" --format="table(name,title)" || echo "⚠️  Could not check API status"
 
     - name: Deploy to Cloud Run
       run: |
