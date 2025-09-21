@@ -13,13 +13,15 @@ CHESS_TEMPLATE = """
         body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
         .chess-board { 
             display: inline-block; 
-            border: 2px solid #333; 
+            border: 3px solid #8b4513; 
             background: #f0d9b5;
-            font-family: monospace;
-            font-size: 24px;
-            line-height: 1.2;
+            font-family: 'Segoe UI Symbol', 'DejaVu Sans', monospace;
+            font-size: 32px;
+            line-height: 1.1;
             white-space: pre;
-            padding: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         .controls { margin: 20px; }
         input { padding: 5px; margin: 5px; }
@@ -30,7 +32,7 @@ CHESS_TEMPLATE = """
     </style>
 </head>
 <body>
-    <h1>♔ Online Chess Game ♕</h1>
+    <h1>♔ ♕ Online Chess Game ♛ ♚</h1>
     
     <div class="chess-board">{{ board_display }}</div>
     
@@ -73,7 +75,7 @@ def add_chess_routes(app):
     def chess_game_page():
         """Chess game web interface"""
         try:
-            board_display = str(chess_game.board)
+            board_display = chess_game.board.to_unicode_string()
             current_player = chess_game.board.current_player.value.title()
             game_status = chess_game.get_game_status()
             
@@ -124,7 +126,7 @@ def add_chess_routes(app):
                         message_type = "error"
             
             # Render updated board
-            board_display = str(chess_game.board)
+            board_display = chess_game.board.to_unicode_string()
             current_player = chess_game.board.current_player.value.title()
             game_status = chess_game.get_game_status()
             

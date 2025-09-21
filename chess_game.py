@@ -261,15 +261,56 @@ class ChessBoard:
         result += "  a b c d e f g h"
         return result
     
-    def get_piece_symbol(self, piece: Piece) -> str:
-        """Get symbol for piece display"""
-        symbols = {
-            PieceType.PAWN: 'P',
-            PieceType.ROOK: 'R',
-            PieceType.KNIGHT: 'N',
-            PieceType.BISHOP: 'B',
-            PieceType.QUEEN: 'Q',
-            PieceType.KING: 'K'
-        }
-        symbol = symbols.get(piece.piece_type, '?')
-        return symbol if piece.color == Color.WHITE else symbol.lower()
+    def to_unicode_string(self):
+        """Unicode string representation of the board for web display"""
+        result = "  a b c d e f g h\n"
+        for row in range(8):
+            result += f"{8-row} "
+            for col in range(8):
+                piece = self.board[row][col]
+                if piece:
+                    symbol = self.get_piece_symbol(piece, use_unicode=True)
+                    result += f"{symbol} "
+                else:
+                    result += ". "
+            result += f"{8-row}\n"
+        result += "  a b c d e f g h"
+        return result
+
+    def get_piece_symbol(self, piece: Piece, use_unicode: bool = False) -> str:
+        """Get symbol for piece display with Unicode option"""
+        if use_unicode:
+            # Unicode chess piece symbols for web display
+            white_symbols = {
+                PieceType.PAWN: '♙',
+                PieceType.ROOK: '♖',
+                PieceType.KNIGHT: '♘',
+                PieceType.BISHOP: '♗',
+                PieceType.QUEEN: '♕',
+                PieceType.KING: '♔'
+            }
+            black_symbols = {
+                PieceType.PAWN: '♟',
+                PieceType.ROOK: '♜',
+                PieceType.KNIGHT: '♞',
+                PieceType.BISHOP: '♝',
+                PieceType.QUEEN: '♛',
+                PieceType.KING: '♚'
+            }
+            
+            if piece.color == Color.WHITE:
+                return white_symbols.get(piece.piece_type, '?')
+            else:
+                return black_symbols.get(piece.piece_type, '?')
+        else:
+            # ASCII symbols for console compatibility
+            symbols = {
+                PieceType.PAWN: 'P',
+                PieceType.ROOK: 'R',
+                PieceType.KNIGHT: 'N',
+                PieceType.BISHOP: 'B',
+                PieceType.QUEEN: 'Q',
+                PieceType.KING: 'K'
+            }
+            symbol = symbols.get(piece.piece_type, '?')
+            return symbol if piece.color == Color.WHITE else symbol.lower()
