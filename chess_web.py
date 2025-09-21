@@ -112,6 +112,16 @@ CHESS_TEMPLATE = """
             justify-content: center;
         }
         
+        .chess-piece.white {
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .chess-piece.black {
+            color: #1a1a1a;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+        }
+        
         .chess-piece:hover {
             transform: scale(1.1);
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
@@ -315,10 +325,10 @@ CHESS_TEMPLATE = """
         console.log('Initial game state:', gameState);
         console.log('Current player:', currentPlayer);
         
-        // Piece symbols mapping
+        // Piece symbols mapping - Using solid symbols for both, differentiated by CSS color
         const pieceSymbols = {
-            'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',  // White pieces
-            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'   // Black pieces
+            'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚',  // White pieces (solid symbols, white color)
+            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'   // Black pieces (solid symbols, black color)
         };
         
         // Initialize the chess board
@@ -338,7 +348,8 @@ CHESS_TEMPLATE = """
                     if (gameState && gameState[row] && gameState[row][col]) {
                         const piece = gameState[row][col];
                         const pieceElement = document.createElement('span');
-                        pieceElement.className = 'chess-piece';
+                        const isWhitePiece = piece === piece.toUpperCase();
+                        pieceElement.className = `chess-piece ${isWhitePiece ? 'white' : 'black'}`;
                         pieceElement.textContent = getPieceSymbol(piece);
                         square.appendChild(pieceElement);
                     }
