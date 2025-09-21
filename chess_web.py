@@ -245,27 +245,7 @@ CHESS_TEMPLATE = """
         }
         }
         
-        .board-coordinates {
-            position: absolute;
-            font-weight: bold;
-            color: #8b4513;
-            font-size: 14px;
-        }
-        
-        .coord-file {
-            bottom: -25px;
-            width: 60px;
-            text-align: center;
-        }
-        
-        .coord-rank {
-            left: -25px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
+
         .controls { 
             margin: 30px 0;
             background: rgba(255, 255, 255, 0.1);
@@ -366,35 +346,14 @@ CHESS_TEMPLATE = """
                 <div id="game-status">{{ game_status }}</div>
             </div>
             <div class="info-card">
-                <h3>Selected Square</h3>
-                <div id="selected-square">None</div>
+                <h3>Move Count</h3>
+                <div id="move-count">0</div>
             </div>
         </div>
         
         <div class="chess-board-container">
             <div class="chess-board" id="chess-board">
                 <!-- Board will be populated by JavaScript -->
-            </div>
-            
-            <!-- Board coordinates -->
-            <div class="board-coordinates">
-                <div class="coord-file" style="left: 4px;">a</div>
-                <div class="coord-file" style="left: 64px;">b</div>
-                <div class="coord-file" style="left: 124px;">c</div>
-                <div class="coord-file" style="left: 184px;">d</div>
-                <div class="coord-file" style="left: 244px;">e</div>
-                <div class="coord-file" style="left: 304px;">f</div>
-                <div class="coord-file" style="left: 364px;">g</div>
-                <div class="coord-file" style="left: 424px;">h</div>
-                
-                <div class="coord-rank" style="top: 4px;">8</div>
-                <div class="coord-rank" style="top: 64px;">7</div>
-                <div class="coord-rank" style="top: 124px;">6</div>
-                <div class="coord-rank" style="top: 184px;">5</div>
-                <div class="coord-rank" style="top: 244px;">4</div>
-                <div class="coord-rank" style="top: 304px;">3</div>
-                <div class="coord-rank" style="top: 364px;">2</div>
-                <div class="coord-rank" style="top: 424px;">1</div>
             </div>
         </div>
         
@@ -438,8 +397,8 @@ CHESS_TEMPLATE = """
         
         // Piece symbols mapping - Using solid symbols for both, differentiated by CSS color
         const pieceSymbols = {
-            'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚',  // White pieces (solid symbols, white color)
-            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'   // Black pieces (solid symbols, black color)
+            'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔',  // White pieces (outlined symbols)
+            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'   // Black pieces (filled symbols)
         };
         
         // Initialize the chess board
@@ -492,7 +451,6 @@ CHESS_TEMPLATE = """
                     if (isCurrentPlayerPiece(piece)) {
                         selectSquare(square);
                         selectedSquare = { row, col, square: squareName };
-                        document.getElementById('selected-square').textContent = squareName;
                     }
                 }
             } else {
@@ -527,7 +485,6 @@ CHESS_TEMPLATE = """
         function deselectSquare() {
             clearSelection();
             selectedSquare = null;
-            document.getElementById('selected-square').textContent = 'None';
         }
         
         // Clear all selections
