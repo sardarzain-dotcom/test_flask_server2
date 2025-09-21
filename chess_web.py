@@ -14,46 +14,63 @@ CHESS_TEMPLATE = """
     <style>
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 20px; 
+            margin: 0; 
+            padding: 20px;
             text-align: center; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             min-height: 100vh;
-            color: white;
+            color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
         
         .game-container {
             max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
+            margin: 20px auto;
+            background: #ffffff;
             border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
+            padding: 40px;
             box-shadow: 
-                0 25px 50px rgba(0,0,0,0.3),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
+                0 10px 30px rgba(0,0,0,0.1),
+                0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid #f0f0f0;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .game-title {
-            font-size: 3em;
+            font-size: 3.2em;
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             text-shadow: 
-                0 0 20px rgba(255,255,255,0.5),
-                0 5px 15px rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #ffd700, #ffed4e, #ffd700);
+                0 2px 4px rgba(0,0,0,0.3),
+                0 0 10px rgba(255,215,0,0.5);
+            background: linear-gradient(135deg, #b8860b, #ffd700, #ffed4e, #ffd700, #b8860b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
+            color: #b8860b;
+            background-size: 200% 100%;
+            animation: goldShimmer 3s ease-in-out infinite;
         }
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        
+        @keyframes goldShimmer {
+            0%, 100% { 
+                background-position: 0% 50%; 
+            }
+            50% { 
+                background-position: 100% 50%; 
+            }
         }
         
         .chess-board-container {
-            display: inline-block;
-            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto;
             position: relative;
+            width: 100%;
         }
         
         .chess-board { 
@@ -262,11 +279,19 @@ CHESS_TEMPLATE = """
         }
         
         .info-card {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px 25px;
-            border-radius: 10px;
-            margin: 5px;
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin: 8px;
             min-width: 150px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h3 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1em;
         }
         
         input, button { 
@@ -334,7 +359,7 @@ CHESS_TEMPLATE = """
 </head>
 <body>
     <div class="game-container">
-        <h1 class="game-title">♔ ♕ Elite Chess Grandmaster ♛ ♚</h1>
+        <h1 class="game-title">♔ ♕ Chess For My Bachas ♛ ♚</h1>
         
         <div class="game-info">
             <div class="info-card">
