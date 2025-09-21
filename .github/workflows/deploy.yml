@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: bamboo-strata-274419
   SERVICE: testflaskserver2
   REGION: us-central1
 
@@ -17,30 +17,47 @@ jobs:
     permissions:
       contents: read
       id-token: write
-
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Google Auth
-      id: auth
-      uses: 'google-github-actions/auth@v2'
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
         project_id: ${{ env.PROJECT_ID }}
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
-    - name: Deploy to Cloud Run
-      id: deploy
-      uses: google-github-actions/deploy-cloudrun@v2
-      with:
-        service: ${{ env.SERVICE }}
-        region: ${{ env.REGION }}
-        project_id: ${{ env.PROJECT_ID }}
-        source: ./
-        flags: '--allow-unauthenticated --port=8080'
+    - name: Verify Authentication
+      run: |
+        gcloud auth list
+        gcloud config list
+        echo "Project: ${{ env.PROJECT_ID }}"
+        echo "Service: ${{ env.SERVICE }}"
+        echo "Region: ${{ env.REGION }}"
 
-    - name: Show Output
-      run: echo "Deployed to ${{ steps.deploy.outputs.url }}"
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ env.SERVICE }} \
+          --source . \
+          --platform managed \
+          --region ${{ env.REGION }} \
+          --allow-unauthenticated \
+          --port 8000 \
+          --memory 1Gi \
+          --cpu 1 \
+          --max-instances 10 \
+          --timeout 300s \
+          --project ${{ env.PROJECT_ID }}
+
+    - name: Get Service URL
+      run: |
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} --format='value(status.url)')
+        echo "✅ Service deployed successfully!"
+        echo "🌐 Main URL: $SERVICE_URL"
+        echo "♟️  Chess Game: $SERVICE_URL/chess"
+        echo "::notice title=Deployment Success::Chess game deployed to $SERVICE_URL/chess"
