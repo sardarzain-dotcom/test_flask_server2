@@ -13,25 +13,34 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Google Auth
       id: auth
-      uses: 'google-github-actions/auth@v0'
+      uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
 
     - name: Deploy to Cloud Run
       id: deploy
-      uses: google-github-actions/deploy-cloudrun@v0
+      uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: ${{ env.SERVICE }}
         region: ${{ env.REGION }}
-        # NOTE: If using a pre-built image, update the image name here
+        project_id: ${{ env.PROJECT_ID }}
         source: ./
-        flags: '--allow-unauthenticated'
+        flags: '--allow-unauthenticated --port=8080'
 
     - name: Show Output
-      run: echo ${{ steps.deploy.outputs.url }}
+      run: echo "Deployed to ${{ steps.deploy.outputs.url }}"

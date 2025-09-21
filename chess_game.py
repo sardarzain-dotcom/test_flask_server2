@@ -43,6 +43,25 @@ class Position:
     def to_algebraic(self) -> str:
         """Convert to algebraic notation (e.g., 'e4')"""
         return chr(ord('a') + self.col) + str(8 - self.row)
+    
+    @classmethod
+    def from_algebraic(cls, notation: str) -> 'Position':
+        """Create Position from algebraic notation (e.g., 'e4' -> Position(4, 4))"""
+        if len(notation) != 2:
+            raise ValueError(f"Invalid algebraic notation: {notation}")
+        
+        file_char = notation[0].lower()
+        rank_char = notation[1]
+        
+        if not ('a' <= file_char <= 'h'):
+            raise ValueError(f"Invalid file: {file_char}")
+        if not ('1' <= rank_char <= '8'):
+            raise ValueError(f"Invalid rank: {rank_char}")
+        
+        col = ord(file_char) - ord('a')  # a=0, b=1, ..., h=7
+        row = 8 - int(rank_char)         # 8=0, 7=1, ..., 1=7
+        
+        return cls(row, col)
 
 class Piece:
     """Base class for all chess pieces"""
