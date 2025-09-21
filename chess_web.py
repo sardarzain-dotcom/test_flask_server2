@@ -28,6 +28,25 @@ CHESS_TEMPLATE = """
             border-radius: 20px;
             padding: 30px;
             backdrop-filter: blur(10px);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .game-title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 
+                0 0 20px rgba(255,255,255,0.5),
+                0 5px 15px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #ffd700, #ffed4e, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
@@ -43,12 +62,15 @@ CHESS_TEMPLATE = """
             grid-template-rows: repeat(8, 60px);
             width: 480px;
             height: 480px;
-            border: 4px solid #8b4513;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 6px solid #8b4513;
+            border-radius: 12px;
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(139,69,19,0.3);
             background: #f0d9b5;
             position: relative;
             gap: 0;
+            transform: perspective(1000px) rotateX(2deg);
         }
         
         .chess-square {
@@ -57,52 +79,115 @@ CHESS_TEMPLATE = """
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 42px;
             font-family: 'Segoe UI Symbol', 'DejaVu Sans', monospace;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             user-select: none;
             box-sizing: border-box;
+            border: 1px solid rgba(0,0,0,0.1);
         }
         
         .chess-square.light {
-            background-color: #f0d9b5;
+            background: linear-gradient(135deg, #f7f1e8 0%, #f0d9b5 50%, #ede0c8 100%);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.4);
         }
         
         .chess-square.dark {
-            background-color: #b58863;
+            background: linear-gradient(135deg, #c4956c 0%, #b58863 50%, #a67c52 100%);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
         
         .chess-square:hover {
-            background-color: #ffeb3b !important;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #fff176 0%, #ffeb3b 50%, #fdd835 100%) !important;
+            transform: scale(1.08) translateY(-2px);
             z-index: 10;
+            box-shadow: 
+                0 12px 30px rgba(0,0,0,0.4),
+                inset 0 0 20px rgba(255,255,255,0.4),
+                0 0 0 3px #4a90e2;
+            filter: brightness(1.15) contrast(1.1);
         }
         
         .chess-square.selected {
             background-color: #4caf50 !important;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 
+                inset 0 0 15px rgba(0,0,0,0.5),
+                0 0 20px rgba(76,175,80,0.6);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 20px rgba(76,175,80,0.6); }
+            50% { box-shadow: inset 0 0 20px rgba(0,0,0,0.7), 0 0 30px rgba(76,175,80,0.8); }
+            100% { box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 20px rgba(76,175,80,0.6); }
         }
         
         .chess-square.possible-move {
             background-color: #81c784 !important;
+            animation: moveHint 2s infinite;
         }
         
         .chess-square.possible-move::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #4caf50;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, #4caf50 0%, #2e7d32 70%, transparent 100%);
             border-radius: 50%;
-            opacity: 0.7;
+            opacity: 0.8;
+            animation: dotPulse 1.5s infinite;
+        }
+        
+        @keyframes moveHint {
+            0% { background-color: #81c784 !important; }
+            50% { background-color: #a5d6a7 !important; }
+            100% { background-color: #81c784 !important; }
+        }
+        
+        @keyframes dotPulse {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.6; }
+        }
+        
+        @keyframes moveComplete {
+            0% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 30px rgba(76,175,80,0.8);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 20px rgba(76,175,80,0.6);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: none;
+            }
+        }
+        
+        .chess-square.move-animation {
+            animation: moveComplete 0.8s ease-out;
+        }
+        
+        @keyframes pieceGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(255,255,255,0.6));
+            }
+            50% { 
+                filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
+            }
+        }
+        
+        .chess-piece.glow {
+            animation: pieceGlow 2s ease-in-out infinite;
         }
         
         .chess-piece {
             cursor: grab;
-            transition: all 0.2s ease;
-            font-size: 36px;
+            transition: all 0.3s ease;
+            font-size: 42px;
             line-height: 1;
             text-align: center;
             width: 100%;
@@ -110,28 +195,54 @@ CHESS_TEMPLATE = """
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+            transform-origin: center;
         }
         
         .chess-piece.white {
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            color: #ffffff;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.8),
+                0 0 8px rgba(255,255,255,0.6),
+                0 0 12px rgba(255,255,255,0.4);
         }
         
         .chess-piece.black {
             color: #1a1a1a;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+            text-shadow: 
+                1px 1px 3px rgba(255,255,255,0.5),
+                0 0 6px rgba(0,0,0,0.8),
+                0 0 10px rgba(0,0,0,0.6);
         }
         
         .chess-piece:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+            transform: scale(1.15) translateY(-2px);
+            filter: drop-shadow(3px 6px 8px rgba(0,0,0,0.6));
+            z-index: 100;
+        }
+        
+        .chess-piece.white:hover {
+            text-shadow: 
+                2px 2px 6px rgba(0,0,0,0.9),
+                0 0 12px rgba(255,255,255,0.8),
+                0 0 20px rgba(255,255,255,0.6);
+        }
+        
+        .chess-piece.black:hover {
+            text-shadow: 
+                1px 1px 4px rgba(255,255,255,0.7),
+                0 0 10px rgba(0,0,0,0.9),
+                0 0 16px rgba(0,0,0,0.8);
         }
         
         .chess-piece.dragging {
             cursor: grabbing;
-            transform: scale(1.2);
+            transform: scale(1.3) rotate(5deg);
             z-index: 1000;
             pointer-events: none;
+            filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.8));
+        }
         }
         
         .board-coordinates {
@@ -243,7 +354,7 @@ CHESS_TEMPLATE = """
 </head>
 <body>
     <div class="game-container">
-        <h1>♔ ♕ Interactive Chess Game ♛ ♚</h1>
+        <h1 class="game-title">♔ ♕ Elite Chess Grandmaster ♛ ♚</h1>
         
         <div class="game-info">
             <div class="info-card">
