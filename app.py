@@ -3,6 +3,15 @@ import os
 
 app = Flask(__name__)
 
+# Import chess web interface
+try:
+    from chess_web import add_chess_routes
+    add_chess_routes(app)
+    CHESS_AVAILABLE = True
+except ImportError as e:
+    CHESS_AVAILABLE = False
+    print(f"Chess game not available: {e}")
+
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
@@ -35,6 +44,10 @@ HOME_TEMPLATE = """
             <p>Home page (this page)</p>
         </div>
         <div class="endpoint">
+            <h3>GET /chess</h3>
+            <p>🎮 <a href="/chess">Play Chess Online!</a></p>
+        </div>
+        <div class="endpoint">
             <h3>GET /api/health</h3>
             <p>Health check endpoint</p>
         </div>
@@ -45,6 +58,10 @@ HOME_TEMPLATE = """
         <div class="endpoint">
             <h3>GET /api/info</h3>
             <p>Application information</p>
+        </div>
+        <div class="endpoint">
+            <h3>GET /api/chess/status</h3>
+            <p>Chess game API status</p>
         </div>
     </div>
 </body>
@@ -119,7 +136,7 @@ def internal_error(error):
 if __name__ == '__main__':
     # Get port from environment variable or default to 5000 for local development
     # Cloud Run uses PORT environment variable
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8000))
     host = os.environ.get('HOST', '0.0.0.0')
     
     # Run the app
