@@ -2,6 +2,7 @@
 from flask import Flask, render_template_string, request, jsonify
 from chess_mechanics import ChessGame
 from chess_game import Position, Color, PieceType
+import json
 
 # Enhanced HTML template for interactive chess game
 CHESS_TEMPLATE = """
@@ -541,7 +542,7 @@ def add_chess_routes(app):
             
             return render_template_string(
                 CHESS_TEMPLATE,
-                board_data=board_data,
+                board_data=json.dumps(board_data),
                 current_player=current_player,
                 game_status=game_status,
                 message=None,
@@ -638,7 +639,7 @@ def add_chess_routes(app):
             
             return render_template_string(
                 CHESS_TEMPLATE,
-                board_data=board_data,
+                board_data=json.dumps(board_data),
                 current_player=current_player,
                 game_status=game_status,
                 message=message,
