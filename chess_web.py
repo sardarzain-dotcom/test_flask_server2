@@ -9,7 +9,7 @@ CHESS_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Interactive Chess Game</title>
+    <title>Chess For My Bachas - Interactive Chess Game</title>
     <meta charset="utf-8">
     <style>
         body { 
