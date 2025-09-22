@@ -269,6 +269,43 @@ CHESS_TEMPLATE = """
             animation: pieceCapture 0.4s ease-in forwards;
         }
         
+        /* Multiplayer specific enhancements */
+        .last-move {
+            box-shadow: 
+                inset 0 0 15px rgba(76,175,80,0.6),
+                0 0 10px rgba(76,175,80,0.4);
+            animation: lastMoveGlow 2s ease-in-out;
+        }
+        
+        @keyframes lastMoveGlow {
+            0% { box-shadow: inset 0 0 15px rgba(76,175,80,0.6), 0 0 10px rgba(76,175,80,0.4); }
+            50% { box-shadow: inset 0 0 25px rgba(76,175,80,0.8), 0 0 20px rgba(76,175,80,0.6); }
+            100% { box-shadow: inset 0 0 15px rgba(76,175,80,0.6), 0 0 10px rgba(76,175,80,0.4); }
+        }
+        
+        /* Enhanced connection status for multiplayer */
+        .connection-status.connected {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+            animation: connectedPulse 3s infinite;
+        }
+        
+        .connection-status.waiting {
+            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+            color: white;
+            animation: waitingPulse 2s infinite;
+        }
+        
+        @keyframes connectedPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(76,175,80,0.6); }
+            50% { box-shadow: 0 0 20px rgba(76,175,80,0.8); }
+        }
+        
+        @keyframes waitingPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,152,0,0.6); }
+            50% { box-shadow: 0 0 20px rgba(255,152,0,0.8); }
+        }
+        
         .chess-piece.glow {
             animation: pieceGlow 2s ease-in-out infinite;
         }
@@ -368,7 +405,7 @@ CHESS_TEMPLATE = """
             opacity: 0.9;  /* Slight transparency while dragging */
         }
         
-        /* Checkmate Modal Styles */
+        /* Game Over Modal Styles */
         .checkmate-modal {
             display: none;
             position: fixed;
@@ -950,7 +987,7 @@ CHESS_TEMPLATE = """
             }
         });
         
-        // Checkmate Modal Functions
+        // Game Over Modal Functions
         function showCheckmateModal(winner, gameStats) {
             const modal = document.getElementById('checkmateModal');
             const winnerElement = document.getElementById('checkmateWinner');
@@ -1042,10 +1079,10 @@ CHESS_TEMPLATE = """
         document.head.appendChild(confettiStyle);
     </script>
     
-    <!-- Checkmate Modal -->
+    <!-- Game Over Modal -->
     <div id="checkmateModal" class="checkmate-modal">
         <div class="checkmate-content">
-            <h2 class="checkmate-title">🏆 CHECKMATE! 🏆</h2>
+            <h2 class="checkmate-title">🏆 GAME OVER! 🏆</h2>
             <div class="checkmate-winner" id="checkmateWinner">Player Wins!</div>
             <div class="checkmate-details" id="checkmateDetails">
                 <p>Congratulations on a brilliant game!</p>
@@ -1179,24 +1216,30 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .status-connected {
-            background: #d4edda;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
             color: #155724;
-            border: 1px solid #c3e6cb;
+            border: 2px solid #c3e6cb;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
         }
         
         .status-waiting {
-            background: #fff3cd;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
             color: #856404;
-            border: 1px solid #ffeaa7;
+            border: 2px solid #ffeaa7;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.2);
         }
         
         .status-error {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
             color: #721c24;
-            border: 1px solid #f5c6cb;
+            border: 2px solid #f5c6cb;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
         }
         
         .player-info {
@@ -1249,19 +1292,26 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 52px;  /* Enhanced from 48px for premium visibility */
             cursor: pointer;
             transition: all 0.2s ease;
             border: 2px solid transparent;
             position: relative;
+            /* Enhanced 3D shadow effects for pieces */
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.6),
+                0 4px 8px rgba(0,0,0,0.3),
+                0 1px 0 rgba(255,255,255,0.2);
         }
         
         .square.light {
-            background: linear-gradient(135deg, #f0d9b5, #ede0c8);
+            background: linear-gradient(135deg, #f0d9b5, #ede0c8, #f5e6d3);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.4);
         }
         
         .square.dark {
-            background: linear-gradient(135deg, #b58863, #a97c50);
+            background: linear-gradient(135deg, #b58863, #a97c50, #9d7043);
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.2);
         }
         
         .square:hover {
@@ -1277,7 +1327,90 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
             transform: scale(1.08);
         }
-        
+
+        /* Enhanced Chess Piece Styling */
+        .chess-piece {
+            font-size: 52px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .chess-piece.white {
+            color: #ffffff;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.8),
+                0 4px 8px rgba(0,0,0,0.4),
+                0 1px 0 rgba(128,128,128,0.8),
+                0 0 20px rgba(255,255,255,0.3);
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+        }
+
+        .chess-piece.black {
+            color: #2c2c2c;
+            text-shadow: 
+                0 2px 4px rgba(255,255,255,0.6),
+                0 4px 8px rgba(255,255,255,0.2),
+                0 1px 0 rgba(255,255,255,0.4),
+                0 0 15px rgba(0,0,0,0.8);
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+        }
+
+        .chess-piece:hover {
+            transform: scale(1.1) translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        .chess-piece.white:hover {
+            text-shadow: 
+                0 3px 6px rgba(0,0,0,0.9),
+                0 6px 12px rgba(0,0,0,0.5),
+                0 0 25px rgba(255,255,255,0.5);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+        }
+
+        .chess-piece.black:hover {
+            text-shadow: 
+                0 3px 6px rgba(255,255,255,0.8),
+                0 6px 12px rgba(255,255,255,0.3),
+                0 0 20px rgba(0,0,0,0.9);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+        }
+
+        /* Enhanced Animation Effects */
+        .chess-piece.placed {
+            animation: piecePlace 0.5s ease-out;
+        }
+
+        .move-animation {
+            animation: squareFlash 0.6s ease;
+        }
+
+        @keyframes piecePlace {
+            0% {
+                transform: scale(0.8) translateY(-10px);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1) translateY(-5px);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes squareFlash {
+            0% { background-color: inherit; }
+            25% { background-color: rgba(76, 175, 80, 0.4); }
+            75% { background-color: rgba(76, 175, 80, 0.2); }
+            100% { background-color: inherit; }
+        }
+
         /* Notification styles */
         .notification {
             position: fixed;
@@ -1439,6 +1572,7 @@ MULTIPLAYER_CHESS_TEMPLATE = """
         let playerColor = null;
         let gameOverNotificationShown = false;
         let lastGameStatus = 'ongoing';
+        let lastNotificationTime = 0;  // Prevent notification spam
         let currentPlayer = 'white';
         let selectedSquare = null;
         let boardData = [];
@@ -1542,24 +1676,33 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Check if board has changed
+                        // Check if board has changed (enhanced with animations)
                         if (data.last_move_time > lastMoveTime) {
-                            updateBoard(data.board);
+                            updateBoardWithAnimation(data.board);
                             currentPlayer = data.current_player;
                             updateCurrentTurn();
                             
                             // Show move notification if it's a new move from opponent
                             if (lastMoveTime > 0 && data.current_player !== playerColor) {
-                                const opponentColor = playerColor === 'white' ? 'black' : 'white';
-                                const opponentName = data.players[opponentColor];
-                                showNotification(
-                                    opponentColor.charAt(0).toUpperCase() + opponentColor.slice(1) + ' Move',
-                                    opponentName + ' made a move!',
-                                    opponentColor
-                                );
+                                const currentTime = Date.now();
+                                // Throttle notifications to prevent spam (min 2 seconds between notifications)
+                                if (currentTime - lastNotificationTime > 2000) {
+                                    const opponentColor = playerColor === 'white' ? 'black' : 'white';
+                                    const opponentName = data.players[opponentColor];
+                                    showNotification(
+                                        opponentColor.charAt(0).toUpperCase() + opponentColor.slice(1) + ' Move',
+                                        opponentName + ' made a move!',
+                                        opponentColor
+                                    );
+                                    lastNotificationTime = currentTime;
+                                }
+                                
+                                // Add subtle board highlight for opponent moves
+                                highlightLastMove();
                             }
                             
                             lastMoveTime = data.last_move_time;
+                            moveCount = data.move_count || moveCount;
                         }
                         
                         // Update player info if both players are connected
@@ -1571,10 +1714,39 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                             }
                         }
                         
-                        // Check for game over
+                        // Check for game over (enhanced for multiplayer)
                         if (data.game_status && data.game_status !== 'ongoing' && !gameOverNotificationShown) {
-                            showNotification('Game Over!', data.game_status, 'game');
                             gameOverNotificationShown = true;
+                            
+                            // Use enhanced game over modal instead of simple notification for better UX
+                            if (data.game_status.includes('Checkmate')) {
+                                // Determine winner with actual player names from multiplayer data
+                                let winner = 'Unknown Player';
+                                let winnerColor = '';
+                                
+                                if (data.game_status.includes('White wins') || data.current_player === 'black') {
+                                    winnerColor = 'white';
+                                    winner = data.players?.white || 'White Player';
+                                } else if (data.game_status.includes('Black wins') || data.current_player === 'white') {
+                                    winnerColor = 'black';
+                                    winner = data.players?.black || 'Black Player';
+                                }
+                                
+                                // Show personalized notification first with enhanced messaging
+                                const isCurrentPlayerWinner = (winnerColor === playerColor);
+                                if (isCurrentPlayerWinner) {
+                                    showNotification('🎉 Victory!', `Amazing! You won the multiplayer game!`, 'success');
+                                } else {
+                                    showNotification('Game Finished', `${winner} won this round. Great game!`, 'info');
+                                }
+                                
+                                setTimeout(() => {
+                                    showCheckmateModal(winner, { moveCount: moveCount });
+                                }, 1000);
+                            } else {
+                                // For stalemate or other game endings
+                                showNotification('Game Over!', data.game_status, 'game');
+                            }
                         }
                     }
                 } catch (error) {
@@ -1615,12 +1787,18 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             }
         }
         
-        // Update connection status
+        // Update connection status with enhanced styling
         function updateConnectionStatus(message, type) {
             const statusEl = document.getElementById('connectionStatus');
             statusEl.textContent = message;
             statusEl.className = 'connection-status status-' + type;
             statusEl.classList.remove('hidden');
+            
+            // Add pulse animation for status changes
+            statusEl.style.animation = 'none';
+            setTimeout(() => {
+                statusEl.style.animation = 'pulse 0.5s ease-in-out';
+            }, 10);
         }
         
         // Update player names
@@ -1664,6 +1842,55 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             renderBoard();
         }
         
+        // Enhanced board update with animations for multiplayer
+        function updateBoardWithAnimation(boardString) {
+            const oldBoard = JSON.parse(JSON.stringify(boardData));
+            updateBoard(boardString);
+            
+            // Find differences and animate changes
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    if (oldBoard[row] && oldBoard[row][col] !== boardData[row][col]) {
+                        animateSquareChange(row, col);
+                    }
+                }
+            }
+        }
+        
+        // Animate square changes
+        function animateSquareChange(row, col) {
+            const square = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (square) {
+                square.classList.add('move-animation');
+                const piece = square.querySelector('.chess-piece');
+                if (piece) {
+                    piece.classList.add('placed');
+                }
+                
+                setTimeout(() => {
+                    square.classList.remove('move-animation');
+                    if (piece) piece.classList.remove('placed');
+                }, 600);
+            }
+        }
+        
+        // Highlight last move for better visual feedback
+        function highlightLastMove() {
+            // Remove previous highlights
+            document.querySelectorAll('.last-move').forEach(sq => sq.classList.remove('last-move'));
+            
+            // Add subtle highlight effect
+            setTimeout(() => {
+                const board = document.getElementById('chessBoard');
+                if (board) {
+                    board.style.boxShadow = '0 0 20px rgba(76,175,80,0.6), ' + board.style.boxShadow;
+                    setTimeout(() => {
+                        board.style.boxShadow = board.style.boxShadow.replace('0 0 20px rgba(76,175,80,0.6), ', '');
+                    }, 1000);
+                }
+            }, 100);
+        }
+        
         // Render chess board
         function renderBoard() {
             const boardEl = document.getElementById('chessBoard');
@@ -1679,7 +1906,13 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                     
                     const piece = boardData[row][col];
                     if (piece !== ' ') {
-                        square.textContent = getPieceSymbol(piece);
+                        const pieceSymbol = getPieceSymbol(piece);
+                        const isWhitePiece = piece === piece.toUpperCase();
+                        
+                        const pieceElement = document.createElement('span');
+                        pieceElement.className = `chess-piece ${isWhitePiece ? 'white' : 'black'}`;
+                        pieceElement.textContent = pieceSymbol;
+                        square.appendChild(pieceElement);
                     }
                     
                     boardEl.appendChild(square);
@@ -1808,17 +2041,22 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             document.getElementById('gameIdInput').value = '';
         }
         
-        // Checkmate Modal Functions (same as single-player)
+        // Game Over Modal Functions (enhanced for multiplayer)
         function showCheckmateModal(winner, gameStats) {
             const modal = document.getElementById('checkmateModal');
             const winnerElement = document.getElementById('checkmateWinner');
             const moveCountElement = document.getElementById('moveCount');
+            const detailsElement = document.getElementById('checkmateDetails');
             
-            // Set winner text with appropriate emoji
-            if (winner.toLowerCase() === 'white') {
+            // Determine if this is the current player or opponent
+            const isCurrentPlayer = (winner.toLowerCase() === playerColor || 
+                                   winner === (playerColor === 'white' ? 'White Player' : 'Black Player'));
+            
+            // Set winner text with appropriate emoji and personalized message
+            if (winner.toLowerCase() === 'white' || winner === 'White Player') {
                 winnerElement.innerHTML = '⚪ White Player Wins! ⚪';
                 winnerElement.style.color = '#1976d2';
-            } else if (winner.toLowerCase() === 'black') {
+            } else if (winner.toLowerCase() === 'black' || winner === 'Black Player') {
                 winnerElement.innerHTML = '⚫ Black Player Wins! ⚫';
                 winnerElement.style.color = '#d32f2f';
             } else {
@@ -1826,11 +2064,25 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                 winnerElement.style.color = '#ff6f00';
             }
             
-            // Set move count from multiplayer data
-            if (gameStats && gameStats.moveCount) {
-                moveCountElement.textContent = gameStats.moveCount;
+            // Update details with personalized message
+            if (isCurrentPlayer) {
+                detailsElement.innerHTML = `
+                    <p>🎉 Congratulations! You won the game! 🎉</p>
+                    <p id="gameStats">Game completed in <span id="moveCount">${gameStats?.moveCount || moveCount || '0'}</span> moves.</p>
+                `;
             } else {
-                moveCountElement.textContent = moveCount || '0';
+                detailsElement.innerHTML = `
+                    <p>Good game! Your opponent won this time.</p>
+                    <p id="gameStats">Game completed in <span id="moveCount">${gameStats?.moveCount || moveCount || '0'}</span> moves.</p>
+                `;
+            }
+            
+            // Set move count
+            const moveCountSpan = detailsElement.querySelector('#moveCount');
+            if (moveCountSpan && gameStats && gameStats.moveCount) {
+                moveCountSpan.textContent = gameStats.moveCount;
+            } else if (moveCountSpan) {
+                moveCountSpan.textContent = moveCount || '0';
             }
             
             // Show modal with animation
@@ -1890,10 +2142,10 @@ MULTIPLAYER_CHESS_TEMPLATE = """
         document.head.appendChild(confettiStyle);
     </script>
     
-    <!-- Checkmate Modal -->
+    <!-- Game Over Modal -->
     <div id="checkmateModal" class="checkmate-modal">
         <div class="checkmate-content">
-            <h2 class="checkmate-title">🏆 CHECKMATE! 🏆</h2>
+            <h2 class="checkmate-title">🏆 GAME OVER! 🏆</h2>
             <div class="checkmate-winner" id="checkmateWinner">Player Wins!</div>
             <div class="checkmate-details" id="checkmateDetails">
                 <p>Congratulations on a brilliant multiplayer game!</p>
