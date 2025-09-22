@@ -1452,46 +1452,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             line-height: 1.4;
         }
         
-        .game-info {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .current-turn {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border: 2px solid #2196f3;
-        }
-        
-        .game-controls {
-            margin-top: 20px;
-        }
-        
-        .game-controls button {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .game-controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-        }
-        
         .hidden {
             display: none;
         }
@@ -1548,15 +1508,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
         
         <!-- Chess Board -->
         <div id="chessBoard" class="chess-board hidden"></div>
-        
-        <!-- Game Information -->
-        <div id="gameInfo" class="game-info hidden">
-            <div id="currentTurn" class="current-turn">Waiting for players...</div>
-            <div class="game-controls">
-                <button onclick="newGame()">New Game</button>
-                <button onclick="leaveGame()">Leave Game</button>
-            </div>
-        </div>
         
         <!-- Notification container -->
         <div id="notification" class="notification">
@@ -1680,7 +1631,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                         if (data.last_move_time > lastMoveTime) {
                             updateBoardWithAnimation(data.board);
                             currentPlayer = data.current_player;
-                            updateCurrentTurn();
                             
                             // Show move notification if it's a new move from opponent
                             if (lastMoveTime > 0 && data.current_player !== playerColor) {
@@ -1774,7 +1724,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                 if (data.success) {
                     updateBoard(data.board);
                     currentPlayer = data.current_player;
-                    updateCurrentTurn();
                     lastMoveTime = data.last_move_time;
                     return true;
                 } else {
@@ -1811,19 +1760,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
         function showGameElements() {
             document.getElementById('playerInfo').classList.remove('hidden');
             document.getElementById('chessBoard').classList.remove('hidden');
-            document.getElementById('gameInfo').classList.remove('hidden');
-        }
-        
-        // Update current turn display
-        function updateCurrentTurn() {
-            const turnEl = document.getElementById('currentTurn');
-            const isMyTurn = currentPlayer === playerColor;
-            const turnText = isMyTurn ? "Your Turn!" : currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1) + "'s Turn";
-            turnEl.textContent = turnText + ' (You are ' + playerColor + ')';
-            
-            // Update player card active state
-            document.getElementById('whitePlayer').classList.toggle('active', currentPlayer === 'white');
-            document.getElementById('blackPlayer').classList.toggle('active', currentPlayer === 'black');
         }
         
         // Update chess board
@@ -2006,39 +1942,6 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             setTimeout(function() {
                 notification.classList.remove('show');
             }, 4000);
-        }
-        
-        // New game function
-        function newGame() {
-            if (confirm('Start a new game? This will create a fresh game.')) {
-                leaveGame();
-                document.getElementById('connectionControls').classList.remove('hidden');
-                document.getElementById('gameIdDisplay').classList.add('hidden');
-            }
-        }
-        
-        // Leave game function
-        function leaveGame() {
-            if (gamePollingInterval) {
-                clearInterval(gamePollingInterval);
-                gamePollingInterval = null;
-            }
-            
-            gameId = null;
-            playerColor = null;
-            selectedSquare = null;
-            boardData = [];
-            
-            document.getElementById('connectionControls').classList.remove('hidden');
-            document.getElementById('gameIdDisplay').classList.add('hidden');
-            document.getElementById('connectionStatus').classList.add('hidden');
-            document.getElementById('playerInfo').classList.add('hidden');
-            document.getElementById('chessBoard').classList.add('hidden');
-            document.getElementById('gameInfo').classList.add('hidden');
-            
-            // Clear inputs
-            document.getElementById('playerName').value = '';
-            document.getElementById('gameIdInput').value = '';
         }
         
         // Game Over Modal Functions (enhanced for multiplayer)
