@@ -91,68 +91,78 @@ CHESS_TEMPLATE = """
             margin: 30px auto;
             position: relative;
             width: 100%;
+            padding: 20px;  /* Added padding for better spacing */
+            background: radial-gradient(ellipse at center, rgba(139,69,19,0.1) 0%, transparent 70%);  /* Subtle background */
         }
         
         .chess-board { 
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(8, 60px);
-            width: 480px;
-            height: 480px;
-            border: 6px solid #8b4513;
-            border-radius: 12px;
+            grid-template-columns: repeat(8, 64px);  /* Slightly larger squares */
+            grid-template-rows: repeat(8, 64px);
+            width: 512px;  /* Updated to match new square size */
+            height: 512px;
+            border: 8px solid #654321;  /* Thicker, richer brown border */
+            border-radius: 16px;  /* More rounded corners */
             box-shadow: 
-                0 15px 35px rgba(0,0,0,0.5),
-                inset 0 0 20px rgba(139,69,19,0.3);
-            background: #f0d9b5;
+                0 20px 40px rgba(0,0,0,0.6),  /* Deeper shadow */
+                inset 0 0 30px rgba(139,69,19,0.4),
+                0 0 0 4px #8b4513,  /* Additional border ring */
+                0 0 0 8px rgba(139,69,19,0.3);
+            background: linear-gradient(135deg, #f0d9b5 0%, #ede0c8 100%);  /* Gradient background */
             position: relative;
             gap: 0;
-            transform: perspective(1000px) rotateX(2deg);
+            transform: perspective(1200px) rotateX(3deg);  /* Enhanced 3D effect */
         }
         
         .chess-square {
-            width: 60px;
-            height: 60px;
+            width: 64px;  /* Updated to match board */
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 42px;
+            font-size: 48px;  /* Increased to match piece size */
             font-family: 'Segoe UI Symbol', 'DejaVu Sans', monospace;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             user-select: none;
             box-sizing: border-box;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.15);  /* Slightly more visible borders */
         }
         
         .chess-square.light {
-            background: linear-gradient(135deg, #f7f1e8 0%, #f0d9b5 50%, #ede0c8 100%);
-            box-shadow: inset 0 1px 3px rgba(255,255,255,0.4);
+            background: linear-gradient(135deg, #faf7f2 0%, #f0d9b5 50%, #ede0c8 100%);
+            box-shadow: 
+                inset 0 2px 4px rgba(255,255,255,0.5),
+                inset 0 -1px 2px rgba(0,0,0,0.1);
         }
         
         .chess-square.dark {
-            background: linear-gradient(135deg, #c4956c 0%, #b58863 50%, #a67c52 100%);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #d18b47 0%, #b58863 50%, #a67c52 100%);
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.3),
+                inset 0 -1px 2px rgba(255,255,255,0.1);
         }
         
         .chess-square:hover {
-            background: linear-gradient(135deg, #fff176 0%, #ffeb3b 50%, #fdd835 100%) !important;
-            transform: scale(1.08) translateY(-2px);
+            background: linear-gradient(135deg, #fff799 0%, #ffeb3b 50%, #fdd835 100%) !important;
+            transform: scale(1.05) translateY(-1px);  /* Reduced from 1.08 for subtlety */
             z-index: 10;
             box-shadow: 
-                0 12px 30px rgba(0,0,0,0.4),
-                inset 0 0 20px rgba(255,255,255,0.4),
-                0 0 0 3px #4a90e2;
-            filter: brightness(1.15) contrast(1.1);
+                0 8px 20px rgba(0,0,0,0.3),  /* Reduced shadow intensity */
+                inset 0 0 15px rgba(255,255,255,0.6),
+                0 0 0 2px #4a90e2;  /* Thinner border */
+            filter: brightness(1.1) contrast(1.05);  /* Reduced intensity */
         }
         
         .chess-square.selected {
-            background-color: #4caf50 !important;
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 50%, #4caf50 100%) !important;
             box-shadow: 
-                inset 0 0 15px rgba(0,0,0,0.5),
-                0 0 20px rgba(76,175,80,0.6);
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 0 25px rgba(76,175,80,0.7),
+                0 0 0 3px #2e7d32;  /* Added border ring */
             animation: pulse 1.5s infinite;
+            transform: scale(1.02);  /* Slight scale to make it stand out */
         }
         
         @keyframes pulse {
@@ -210,10 +220,12 @@ CHESS_TEMPLATE = """
         
         @keyframes pieceGlow {
             0%, 100% { 
-                filter: drop-shadow(0 0 10px rgba(255,255,255,0.6));
+                filter: drop-shadow(0 0 12px rgba(255,255,255,0.7));
+                transform: scale(1);
             }
             50% { 
-                filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
+                filter: drop-shadow(0 0 25px rgba(255,255,255,1.0));
+                transform: scale(1.02);  /* Slight pulsing */
             }
         }
         
@@ -224,7 +236,7 @@ CHESS_TEMPLATE = """
         .chess-piece {
             cursor: grab;
             transition: all 0.3s ease;
-            font-size: 42px;
+            font-size: 48px;  /* Increased from 42px */
             line-height: 1;
             text-align: center;
             width: 100%;
@@ -233,52 +245,61 @@ CHESS_TEMPLATE = """
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+            filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));  /* Enhanced shadow */
             transform-origin: center;
+            font-family: 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', serif;  /* Better font stack */
         }
         
         .chess-piece.white {
             color: #ffffff;
             text-shadow: 
-                2px 2px 4px rgba(0,0,0,0.8),
-                0 0 8px rgba(255,255,255,0.6),
-                0 0 12px rgba(255,255,255,0.4);
+                3px 3px 6px rgba(0,0,0,0.9),
+                0 0 10px rgba(255,255,255,0.8),
+                0 0 15px rgba(255,255,255,0.6),
+                0 0 20px rgba(200,200,255,0.4);  /* Added blue glow */
+            filter: drop-shadow(3px 3px 8px rgba(0,0,0,0.6));
         }
         
         .chess-piece.black {
             color: #1a1a1a;
             text-shadow: 
-                1px 1px 3px rgba(255,255,255,0.5),
-                0 0 6px rgba(0,0,0,0.8),
-                0 0 10px rgba(0,0,0,0.6);
+                2px 2px 4px rgba(255,255,255,0.6),
+                0 0 8px rgba(0,0,0,0.9),
+                0 0 12px rgba(0,0,0,0.7),
+                0 0 16px rgba(80,80,80,0.5);  /* Added gray glow */
+            filter: drop-shadow(2px 2px 6px rgba(255,255,255,0.3));
         }
         
         .chess-piece:hover {
-            transform: scale(1.15) translateY(-2px);
-            filter: drop-shadow(3px 6px 8px rgba(0,0,0,0.6));
+            transform: scale(1.2) translateY(-3px);  /* Increased scale and movement */
+            filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.7));
             z-index: 100;
+            transition: all 0.2s ease-out;  /* Faster response */
         }
         
         .chess-piece.white:hover {
             text-shadow: 
-                2px 2px 6px rgba(0,0,0,0.9),
-                0 0 12px rgba(255,255,255,0.8),
-                0 0 20px rgba(255,255,255,0.6);
+                3px 3px 8px rgba(0,0,0,1.0),
+                0 0 15px rgba(255,255,255,1.0),
+                0 0 25px rgba(255,255,255,0.8),
+                0 0 35px rgba(200,200,255,0.6);  /* Enhanced glow */
         }
         
         .chess-piece.black:hover {
             text-shadow: 
-                1px 1px 4px rgba(255,255,255,0.7),
-                0 0 10px rgba(0,0,0,0.9),
-                0 0 16px rgba(0,0,0,0.8);
+                2px 2px 6px rgba(255,255,255,0.8),
+                0 0 12px rgba(0,0,0,1.0),
+                0 0 20px rgba(0,0,0,0.8),
+                0 0 30px rgba(80,80,80,0.7);  /* Enhanced glow */
         }
         
         .chess-piece.dragging {
             cursor: grabbing;
-            transform: scale(1.3) rotate(5deg);
+            transform: scale(1.4) rotate(8deg);  /* Larger scale and more rotation */
             z-index: 1000;
             pointer-events: none;
-            filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.8));
+            filter: drop-shadow(6px 12px 20px rgba(0,0,0,0.8));  /* Deeper shadow */
+            opacity: 0.9;  /* Slight transparency while dragging */
         }
         }
         
