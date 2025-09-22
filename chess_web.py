@@ -1111,6 +1111,8 @@ MULTIPLAYER_CHESS_TEMPLATE = """
         let gameId = null;
         let playerName = '';
         let playerColor = null;
+        let gameOverNotificationShown = false;
+        let lastGameStatus = 'ongoing';
         let currentPlayer = 'white';
         let selectedSquare = null;
         let boardData = [];
@@ -1141,6 +1143,8 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                 if (data.success) {
                     gameId = data.game_id;
                     playerColor = data.player_color;
+                    gameOverNotificationShown = false; // Reset for new game
+                    lastGameStatus = 'ongoing'; // Reset for new game
                     
                     document.getElementById('currentGameId').textContent = gameId;
                     document.getElementById('gameIdDisplay').classList.remove('hidden');
@@ -1183,6 +1187,8 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                 if (data.success) {
                     gameId = data.game_id;
                     playerColor = data.player_color;
+                    gameOverNotificationShown = false; // Reset for new game
+                    lastGameStatus = 'ongoing'; // Reset for new game
                     
                     document.getElementById('currentGameId').textContent = gameId;
                     document.getElementById('gameIdDisplay').classList.remove('hidden');
@@ -1240,8 +1246,9 @@ MULTIPLAYER_CHESS_TEMPLATE = """
                         }
                         
                         // Check for game over
-                        if (data.game_status && data.game_status !== 'ongoing') {
+                        if (data.game_status && data.game_status !== 'ongoing' && !gameOverNotificationShown) {
                             showNotification('Game Over!', data.game_status, 'game');
+                            gameOverNotificationShown = true;
                         }
                     }
                 } catch (error) {
