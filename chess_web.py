@@ -229,6 +229,46 @@ CHESS_TEMPLATE = """
             }
         }
         
+        /* Enhanced piece placement animation */
+        @keyframes piecePlacement {
+            0% { 
+                transform: scale(0.5) translateY(-20px) rotateY(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1) translateY(-5px) rotateY(90deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: scale(1) translateY(0) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .chess-piece.placed {
+            animation: piecePlacement 0.6s ease-out;
+        }
+        
+        /* Piece capture animation */
+        @keyframes pieceCapture {
+            0% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(15deg);
+                opacity: 0.5;
+            }
+            100% { 
+                transform: scale(0) rotate(45deg);
+                opacity: 0;
+            }
+        }
+        
+        .chess-piece.captured {
+            animation: pieceCapture 0.4s ease-in forwards;
+        }
+        
         .chess-piece.glow {
             animation: pieceGlow 2s ease-in-out infinite;
         }
@@ -236,7 +276,7 @@ CHESS_TEMPLATE = """
         .chess-piece {
             cursor: grab;
             transition: all 0.3s ease;
-            font-size: 48px;  /* Increased from 42px */
+            font-size: 52px;  /* Increased from 48px for even better visibility */
             line-height: 1;
             text-align: center;
             width: 100%;
@@ -245,36 +285,62 @@ CHESS_TEMPLATE = """
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));  /* Enhanced shadow */
+            filter: 
+                drop-shadow(4px 4px 8px rgba(0,0,0,0.6))
+                drop-shadow(0 0 10px rgba(255,255,255,0.2));  /* Dual shadow effect */
             transform-origin: center;
-            font-family: 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', serif;  /* Better font stack */
+            font-family: 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', 'DejaVu Sans', serif;
+            /* 3D effect */
+            background: radial-gradient(ellipse at center top, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
         }
         
         .chess-piece.white {
             color: #ffffff;
             text-shadow: 
-                3px 3px 6px rgba(0,0,0,0.9),
-                0 0 10px rgba(255,255,255,0.8),
-                0 0 15px rgba(255,255,255,0.6),
-                0 0 20px rgba(200,200,255,0.4);  /* Added blue glow */
-            filter: drop-shadow(3px 3px 8px rgba(0,0,0,0.6));
+                4px 4px 8px rgba(0,0,0,1.0),  /* Strong black outline */
+                0 0 12px rgba(255,255,255,0.9),  /* Inner white glow */
+                0 0 20px rgba(255,255,255,0.7),  /* Outer white glow */
+                0 0 30px rgba(220,220,255,0.5),  /* Blue aura */
+                2px 2px 0px rgba(0,0,0,0.8),     /* Crisp edge definition */
+                -2px -2px 0px rgba(255,255,255,0.3);  /* Highlight edge */
+            filter: 
+                drop-shadow(4px 4px 10px rgba(0,0,0,0.7))
+                drop-shadow(0 0 15px rgba(255,255,255,0.4));
+            /* Subtle 3D gradient overlay */
+            background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 60%);
         }
         
         .chess-piece.black {
             color: #1a1a1a;
             text-shadow: 
-                2px 2px 4px rgba(255,255,255,0.6),
-                0 0 8px rgba(0,0,0,0.9),
-                0 0 12px rgba(0,0,0,0.7),
-                0 0 16px rgba(80,80,80,0.5);  /* Added gray glow */
-            filter: drop-shadow(2px 2px 6px rgba(255,255,255,0.3));
+                3px 3px 6px rgba(255,255,255,0.7),  /* White outline for contrast */
+                0 0 10px rgba(0,0,0,1.0),           /* Strong black inner glow */
+                0 0 15px rgba(0,0,0,0.8),           /* Black aura */
+                0 0 20px rgba(60,60,60,0.6),        /* Gray outer glow */
+                1px 1px 0px rgba(255,255,255,0.4),  /* Crisp light edge */
+                -1px -1px 0px rgba(0,0,0,0.9);      /* Dark definition edge */
+            filter: 
+                drop-shadow(3px 3px 8px rgba(255,255,255,0.4))
+                drop-shadow(0 0 12px rgba(0,0,0,0.8));
+            /* Subtle 3D gradient overlay */
+            background: radial-gradient(ellipse at 30% 30%, rgba(120,120,120,0.3) 0%, transparent 60%);
         }
         
         .chess-piece:hover {
-            transform: scale(1.2) translateY(-3px);  /* Increased scale and movement */
-            filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.7));
+            transform: scale(1.25) translateY(-4px) rotateX(10deg);  /* Enhanced 3D effect */
+            filter: 
+                drop-shadow(6px 10px 16px rgba(0,0,0,0.8))
+                drop-shadow(0 0 20px rgba(255,255,255,0.6));
             z-index: 100;
-            transition: all 0.2s ease-out;  /* Faster response */
+            transition: all 0.2s ease-out;
+            /* Enhanced glow effect on hover */
+            animation: pieceHoverGlow 0.3s ease-out forwards;
+        }
+        
+        @keyframes pieceHoverGlow {
+            0% { filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.6)) drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+            100% { filter: drop-shadow(6px 10px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 25px rgba(255,255,255,0.8)); }
         }
         
         .chess-piece.white:hover {
@@ -300,6 +366,135 @@ CHESS_TEMPLATE = """
             pointer-events: none;
             filter: drop-shadow(6px 12px 20px rgba(0,0,0,0.8));  /* Deeper shadow */
             opacity: 0.9;  /* Slight transparency while dragging */
+        }
+        
+        /* Checkmate Modal Styles */
+        .checkmate-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+        
+        .checkmate-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkmate-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.1);
+            max-width: 450px;
+            width: 90%;
+            animation: modalSlideIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkmate-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+            animation: goldShimmer 2s infinite;
+        }
+        
+        .checkmate-title {
+            font-size: 2.5em;
+            color: #d32f2f;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+        
+        .checkmate-winner {
+            font-size: 1.8em;
+            color: #1976d2;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .checkmate-details {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .checkmate-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .checkmate-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .checkmate-btn.primary {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76,175,80,0.4);
+        }
+        
+        .checkmate-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76,175,80,0.6);
+        }
+        
+        .checkmate-btn.secondary {
+            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33,150,243,0.4);
+        }
+        
+        .checkmate-btn.secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33,150,243,0.6);
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideIn {
+            from { 
+                transform: scale(0.7) translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes goldShimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
         }
         }
         
@@ -648,10 +843,13 @@ CHESS_TEMPLATE = """
                     });
                     
                     // Show special game notifications
-                    if (data.game_status.includes('Check')) {
+                    if (data.game_status.includes('Check') && !data.game_status.includes('Checkmate')) {
                         showGameNotification(`${currentPlayer} is in Check!`, 'warning');
                     } else if (data.game_status.includes('Checkmate')) {
-                        showGameNotification(`Checkmate! ${previousPlayer} wins!`, 'victory');
+                        // Show checkmate modal instead of simple notification
+                        setTimeout(() => {
+                            showCheckmateModal(previousPlayer, { moveCount: currentMoveCount });
+                        }, 500);  // Small delay for better UX
                     } else if (data.game_status.includes('Stalemate')) {
                         showGameNotification('Stalemate! Game is a draw.', 'info');
                     }
@@ -751,7 +949,114 @@ CHESS_TEMPLATE = """
                 document.getElementById('to-pos').value = '';
             }
         });
+        
+        // Checkmate Modal Functions
+        function showCheckmateModal(winner, gameStats) {
+            const modal = document.getElementById('checkmateModal');
+            const winnerElement = document.getElementById('checkmateWinner');
+            const moveCountElement = document.getElementById('moveCount');
+            
+            // Set winner text with appropriate emoji
+            if (winner.toLowerCase() === 'white') {
+                winnerElement.innerHTML = '⚪ White Player Wins! ⚪';
+                winnerElement.style.color = '#1976d2';
+            } else if (winner.toLowerCase() === 'black') {
+                winnerElement.innerHTML = '⚫ Black Player Wins! ⚫';
+                winnerElement.style.color = '#d32f2f';
+            } else {
+                winnerElement.innerHTML = `👑 ${winner} Wins! 👑`;
+                winnerElement.style.color = '#ff6f00';
+            }
+            
+            // Set move count
+            if (gameStats && gameStats.moveCount) {
+                moveCountElement.textContent = gameStats.moveCount;
+            } else {
+                // Try to get from page element
+                const pageMovCount = document.getElementById('move-count');
+                if (pageMovCount) {
+                    moveCountElement.textContent = pageMovCount.textContent || '0';
+                }
+            }
+            
+            // Show modal with animation
+            modal.classList.add('show');
+            
+            // Add celebration confetti effect
+            setTimeout(() => {
+                createConfetti();
+            }, 300);
+        }
+        
+        function closeCheckmateModal() {
+            const modal = document.getElementById('checkmateModal');
+            modal.classList.remove('show');
+        }
+        
+        function startNewGame() {
+            closeCheckmateModal();
+            // Restart the game
+            fetch('/chess', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=restart'
+            }).then(() => {
+                location.reload();
+            });
+        }
+        
+        function createConfetti() {
+            // Simple confetti animation
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        top: -10px;
+                        left: ${Math.random() * 100}%;
+                        width: 10px;
+                        height: 10px;
+                        background: ${['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'][Math.floor(Math.random() * 5)]};
+                        pointer-events: none;
+                        z-index: 15000;
+                        border-radius: 50%;
+                        animation: confettiFall 3s linear forwards;
+                    `;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+        
+        // Add confetti animation CSS
+        const confettiStyle = document.createElement('style');
+        confettiStyle.textContent = `
+            @keyframes confettiFall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(confettiStyle);
     </script>
+    
+    <!-- Checkmate Modal -->
+    <div id="checkmateModal" class="checkmate-modal">
+        <div class="checkmate-content">
+            <h2 class="checkmate-title">🏆 CHECKMATE! 🏆</h2>
+            <div class="checkmate-winner" id="checkmateWinner">Player Wins!</div>
+            <div class="checkmate-details" id="checkmateDetails">
+                <p>Congratulations on a brilliant game!</p>
+                <p id="gameStats">Game completed in <span id="moveCount">0</span> moves.</p>
+            </div>
+            <div class="checkmate-buttons">
+                <button class="checkmate-btn primary" onclick="startNewGame()">🔄 New Game</button>
+                <button class="checkmate-btn secondary" onclick="closeCheckmateModal()">📊 Review Game</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 """
@@ -1502,7 +1807,104 @@ MULTIPLAYER_CHESS_TEMPLATE = """
             document.getElementById('playerName').value = '';
             document.getElementById('gameIdInput').value = '';
         }
+        
+        // Checkmate Modal Functions (same as single-player)
+        function showCheckmateModal(winner, gameStats) {
+            const modal = document.getElementById('checkmateModal');
+            const winnerElement = document.getElementById('checkmateWinner');
+            const moveCountElement = document.getElementById('moveCount');
+            
+            // Set winner text with appropriate emoji
+            if (winner.toLowerCase() === 'white') {
+                winnerElement.innerHTML = '⚪ White Player Wins! ⚪';
+                winnerElement.style.color = '#1976d2';
+            } else if (winner.toLowerCase() === 'black') {
+                winnerElement.innerHTML = '⚫ Black Player Wins! ⚫';
+                winnerElement.style.color = '#d32f2f';
+            } else {
+                winnerElement.innerHTML = `👑 ${winner} Wins! 👑`;
+                winnerElement.style.color = '#ff6f00';
+            }
+            
+            // Set move count from multiplayer data
+            if (gameStats && gameStats.moveCount) {
+                moveCountElement.textContent = gameStats.moveCount;
+            } else {
+                moveCountElement.textContent = moveCount || '0';
+            }
+            
+            // Show modal with animation
+            modal.classList.add('show');
+            
+            // Add celebration confetti effect
+            setTimeout(() => {
+                createConfetti();
+            }, 300);
+        }
+        
+        function closeCheckmateModal() {
+            const modal = document.getElementById('checkmateModal');
+            modal.classList.remove('show');
+        }
+        
+        function startNewGame() {
+            closeCheckmateModal();
+            // Reload page to start fresh
+            location.reload();
+        }
+        
+        function createConfetti() {
+            // Simple confetti animation
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        top: -10px;
+                        left: ${Math.random() * 100}%;
+                        width: 10px;
+                        height: 10px;
+                        background: ${['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'][Math.floor(Math.random() * 5)]};
+                        pointer-events: none;
+                        z-index: 15000;
+                        border-radius: 50%;
+                        animation: confettiFall 3s linear forwards;
+                    `;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+        
+        // Add confetti animation CSS
+        const confettiStyle = document.createElement('style');
+        confettiStyle.textContent = `
+            @keyframes confettiFall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(confettiStyle);
     </script>
+    
+    <!-- Checkmate Modal -->
+    <div id="checkmateModal" class="checkmate-modal">
+        <div class="checkmate-content">
+            <h2 class="checkmate-title">🏆 CHECKMATE! 🏆</h2>
+            <div class="checkmate-winner" id="checkmateWinner">Player Wins!</div>
+            <div class="checkmate-details" id="checkmateDetails">
+                <p>Congratulations on a brilliant multiplayer game!</p>
+                <p id="gameStats">Game completed in <span id="moveCount">0</span> moves.</p>
+            </div>
+            <div class="checkmate-buttons">
+                <button class="checkmate-btn primary" onclick="startNewGame()">🔄 New Game</button>
+                <button class="checkmate-btn secondary" onclick="closeCheckmateModal()">📊 Review Game</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 """
