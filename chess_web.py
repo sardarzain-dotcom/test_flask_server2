@@ -333,6 +333,49 @@ CHESS_TEMPLATE = """
             to { opacity: 1; transform: translateY(0); }
         }
         
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideIn 0.5s ease, fadeOut 0.5s ease 4.5s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .notification.white-move {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+        }
+        
+        .notification.black-move {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+        }
+        
+        .notification.warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+        
+        .notification.victory {
+            background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+        }
+        
+        .notification.info {
+            background: linear-gradient(45deg, #607d8b, #455a64);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(300px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
         .error { 
             background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
             color: white;
@@ -542,11 +585,36 @@ CHESS_TEMPLATE = """
             .then(data => {
                 console.log('Move response:', data);
                 if (data.success) {
+                    const previousPlayer = currentPlayer; // Store who made the move
                     gameState = data.board_data;
                     currentPlayer = data.current_player;
                     document.getElementById('current-player').textContent = currentPlayer;
                     document.getElementById('game-status').textContent = data.game_status;
+                    
+                    // Update move count
+                    const moveCountElement = document.getElementById('move-count');
+                    const currentMoveCount = parseInt(moveCountElement.textContent) + 1;
+                    moveCountElement.textContent = currentMoveCount;
+                    
                     showMessage(data.message, 'success');
+                    
+                    // Show move notification with move details
+                    showMoveNotification(previousPlayer, {
+                        from: from,
+                        to: to,
+                        moveNumber: currentMoveCount,
+                        gameStatus: data.game_status
+                    });
+                    
+                    // Show special game notifications
+                    if (data.game_status.includes('Check')) {
+                        showGameNotification(`${currentPlayer} is in Check!`, 'warning');
+                    } else if (data.game_status.includes('Checkmate')) {
+                        showGameNotification(`Checkmate! ${previousPlayer} wins!`, 'victory');
+                    } else if (data.game_status.includes('Stalemate')) {
+                        showGameNotification('Stalemate! Game is a draw.', 'info');
+                    }
+                    
                     initializeBoard();
                 } else {
                     showMessage(data.message, 'error');
@@ -580,6 +648,52 @@ CHESS_TEMPLATE = """
                     }
                 }, 500);
             }, 3000);
+        }
+        
+        // Show move notification
+        function showMoveNotification(playerWhoMoved, moveDetails) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${playerWhoMoved.toLowerCase()}-move`;
+            
+            const nextPlayer = playerWhoMoved === 'White' ? 'Black' : 'White';
+            notification.innerHTML = `
+                <strong>${playerWhoMoved} moved!</strong><br>
+                <small>Move ${moveDetails.moveNumber}: ${moveDetails.from} → ${moveDetails.to}</small><br>
+                <strong>${nextPlayer}, it's your turn!</strong>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+        
+        // Show game event notifications (check, checkmate, etc.)
+        function showGameNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<strong>${message}</strong>`;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 6000);
+        }
+        
+        // Reset game state for new game
+        function resetGameState() {
+            document.getElementById('move-count').textContent = '0';
+            selectedSquare = null;
+            clearSelection();
+            // Show new game notification
+            showGameNotification('New game started! White goes first.', 'info');
         }
         
         // Initialize board on page load
