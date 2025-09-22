@@ -1519,7 +1519,7 @@ def add_chess_routes(app):
         """Chess game web interface"""
         try:
             board_data = get_board_data()
-            current_player = chess_game.board.current_player.value.title()
+            current_player = chess_game.current_player.title()
             game_status = chess_game.get_game_status()
             
             return render_template_string(
@@ -1553,18 +1553,22 @@ def add_chess_routes(app):
                 to_position = Position.from_algebraic(to_pos)
                 
                 # Make the move
-                if chess_game.make_move(from_position, to_position):
+                result = chess_game.make_move(from_position, to_position)
+                
+                if result['success']:
                     return jsonify({
                         'success': True,
                         'message': f'Move {from_pos} to {to_pos} successful!',
                         'board_data': get_board_data(),
-                        'current_player': chess_game.board.current_player.value.title(),
-                        'game_status': chess_game.get_game_status()
+                        'current_player': chess_game.current_player.title(),
+                        'game_status': chess_game.get_game_status(),
+                        'move_notation': result.get('move_notation', ''),
+                        'move_count': chess_game.move_count
                     })
                 else:
                     return jsonify({
                         'success': False,
-                        'message': f'Invalid move: {from_pos} to {to_pos}'
+                        'message': result.get('message', f'Invalid move: {from_pos} to {to_pos}')
                     })
             except Exception as e:
                 return jsonify({
@@ -1604,11 +1608,12 @@ def add_chess_routes(app):
                         to_position = Position.from_algebraic(to_pos)
                         
                         # Make the move
-                        if chess_game.make_move(from_position, to_position):
+                        result = chess_game.make_move(from_position, to_position)
+                        if result['success']:
                             message = f"Move {from_pos} to {to_pos} successful!"
                             message_type = "success"
                         else:
-                            message = f"Invalid move: {from_pos} to {to_pos}"
+                            message = result.get('message', f"Invalid move: {from_pos} to {to_pos}")
                             message_type = "error"
                     except Exception as e:
                         message = f"Invalid position format: {e}"
@@ -1616,7 +1621,7 @@ def add_chess_routes(app):
             
             # Render updated board
             board_data = get_board_data()
-            current_player = chess_game.board.current_player.value.title()
+            current_player = chess_game.current_player.title()
             game_status = chess_game.get_game_status()
             
             return render_template_string(
@@ -1636,10 +1641,10 @@ def add_chess_routes(app):
         """API endpoint for chess game status"""
         try:
             return jsonify({
-                'current_player': chess_game.board.current_player.value,
+                'current_player': chess_game.current_player,
                 'game_status': chess_game.get_game_status(),
                 'board': str(chess_game.board),
-                'move_count': len(chess_game.move_history)
+                'move_count': chess_game.move_count
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 500

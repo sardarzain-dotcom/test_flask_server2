@@ -56,6 +56,41 @@ class ChessGame:
         self.selected_piece = None
         self.selected_position = None
         self.valid_moves = []
+        # Initialize move count
+        self.move_count = 0
+
+    @property
+    def current_player(self):
+        """Get current player as string"""
+        return self.board.current_player.value.lower()
+
+    def get_board_string(self):
+        """Get board as string representation for display"""
+        return str(self.board)
+
+    def get_board_array(self):
+        """Get board as 2D array for JavaScript"""
+        board_data = []
+        for row in range(8):
+            board_row = []
+            for col in range(8):
+                piece = self.board.board[row][col]
+                if piece:
+                    # Convert piece to simple character representation
+                    symbols = {
+                        PieceType.PAWN: 'P',
+                        PieceType.ROOK: 'R',
+                        PieceType.KNIGHT: 'N',
+                        PieceType.BISHOP: 'B',
+                        PieceType.QUEEN: 'Q',
+                        PieceType.KING: 'K'
+                    }
+                    symbol = symbols.get(piece.piece_type, '?')
+                    board_row.append(symbol if piece.color == Color.WHITE else symbol.lower())
+                else:
+                    board_row.append(' ')
+            board_data.append(board_row)
+        return board_data
     
     def select_square(self, position: Position) -> bool:
         """Select a square on the board"""
@@ -100,24 +135,53 @@ class ChessGame:
         self.selected_position = None
         self.valid_moves = []
     
-    def make_move(self, from_pos: Position, to_pos: Position) -> bool:
+    def make_move(self, from_pos: Position, to_pos: Position) -> dict:
         """Make a move and update game state"""
-        # Handle castling
-        piece = self.board.get_piece(from_pos)
-        if (piece and piece.piece_type == PieceType.KING and 
-            abs(to_pos.col - from_pos.col) == 2):
-            return self._handle_castling(from_pos, to_pos)
-        
-        # Make the move
-        success = self.board.make_move(from_pos, to_pos)
-        if success:
-            # Handle pawn promotion
-            self._handle_pawn_promotion(to_pos)
+        try:
+            # Handle castling
+            piece = self.board.get_piece(from_pos)
+            if not piece:
+                return {'success': False, 'message': 'No piece at source position'}
             
-            # Update game state
-            self._update_game_state()
-        
-        return success
+            if piece.color != self.board.current_player:
+                return {'success': False, 'message': 'Not your turn'}
+            
+            # Check if the move is valid
+            valid_moves = self.board.get_valid_moves(piece)
+            if to_pos not in valid_moves:
+                return {'success': False, 'message': 'Invalid move'}
+            
+            if (piece.piece_type == PieceType.KING and 
+                abs(to_pos.col - from_pos.col) == 2):
+                success = self._handle_castling(from_pos, to_pos)
+            else:
+                # Make the move
+                success = self.board.make_move(from_pos, to_pos)
+            
+            if success:
+                # Increment move count
+                self.move_count += 1
+                
+                # Handle pawn promotion
+                self._handle_pawn_promotion(to_pos)
+                
+                # Update game state
+                self._update_game_state()
+                
+                # Generate move notation
+                move_notation = f"{from_pos.to_algebraic()}-{to_pos.to_algebraic()}"
+                
+                return {
+                    'success': True,
+                    'move_notation': move_notation,
+                    'game_status': self.get_game_status(),
+                    'current_player': self.current_player
+                }
+            else:
+                return {'success': False, 'message': 'Move failed'}
+                
+        except Exception as e:
+            return {'success': False, 'message': f'Error: {str(e)}'}
     
     def _handle_castling(self, king_from: Position, king_to: Position) -> bool:
         """Handle castling move"""

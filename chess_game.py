@@ -333,3 +333,18 @@ class ChessBoard:
             }
             symbol = symbols.get(piece.piece_type, '?')
             return symbol if piece.color == Color.WHITE else symbol.lower()
+
+    def board_to_string(self) -> str:
+        """Get board representation as a simple string for multiplayer sync"""
+        result = ""
+        for row in range(8):
+            for col in range(8):
+                piece = self.board[row][col]
+                if piece:
+                    symbol = self.get_piece_symbol(piece, use_unicode=False)
+                    result += symbol
+                else:
+                    result += " "
+            if row < 7:  # Don't add newline after last row
+                result += "\n"
+        return result
