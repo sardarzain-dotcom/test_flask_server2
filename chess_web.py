@@ -1,8 +1,28 @@
 # Chess game web interface for Flask
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template_string, request, jsonify, session
 from chess_mechanics import ChessGame
 from chess_game import Position, Color, PieceType
 import json
+import time
+import uuid
+
+# Global game sessions for multiplayer
+game_sessions = {}
+session_cleanup_time = {}
+
+def cleanup_old_sessions():
+    """Remove game sessions older than 1 hour"""
+    current_time = time.time()
+    sessions_to_remove = []
+    for session_id, cleanup_time in session_cleanup_time.items():
+        if current_time - cleanup_time > 3600:  # 1 hour
+            sessions_to_remove.append(session_id)
+    
+    for session_id in sessions_to_remove:
+        if session_id in game_sessions:
+            del game_sessions[session_id]
+        if session_id in session_cleanup_time:
+            del session_cleanup_time[session_id]
 
 # Enhanced HTML template for interactive chess game
 CHESS_TEMPLATE = """
@@ -715,6 +735,750 @@ CHESS_TEMPLATE = """
 </html>
 """
 
+# Multiplayer Chess Template (HTTP Polling-based)
+MULTIPLAYER_CHESS_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chess For My Bachas - Multiplayer Chess</title>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            text-align: center; 
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.1),
+                0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid #f0f0f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .game-title {
+            font-size: 3.2em;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.3),
+                0 0 10px rgba(255,215,0,0.5);
+            background: linear-gradient(135deg, #b8860b, #ffd700, #ffed4e, #ffd700, #b8860b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .multiplayer-controls {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .player-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .player-input input {
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 200px;
+        }
+        
+        .btn {
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+        
+        .connection-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        
+        .player-card {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .player-card.active {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+        
+        .player-card.white {
+            border-left: 5px solid #28a745;
+        }
+        
+        .player-card.black {
+            border-left: 5px solid #6c757d;
+        }
+        
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0;
+            width: 640px;
+            height: 640px;
+            margin: 30px auto;
+            border: 4px solid #8B4513;
+            border-radius: 12px;
+            box-shadow: 
+                0 8px 32px rgba(139, 69, 19, 0.3),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            padding: 8px;
+        }
+        
+        .square {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .square.light {
+            background: linear-gradient(135deg, #f0d9b5, #ede0c8);
+        }
+        
+        .square.dark {
+            background: linear-gradient(135deg, #b58863, #a97c50);
+        }
+        
+        .square:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            z-index: 10;
+        }
+        
+        .square.selected {
+            background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transform: scale(1.08);
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            border-left: 5px solid #007bff;
+            z-index: 1000;
+            transition: right 0.5s ease-in-out;
+            max-width: 350px;
+            min-width: 300px;
+        }
+        
+        .notification.show {
+            right: 20px;
+        }
+        
+        .notification.white-move {
+            border-left-color: #28a745;
+        }
+        
+        .notification.black-move {
+            border-left-color: #6c757d;
+        }
+        
+        .notification-header {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .notification-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .game-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .current-turn {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid #2196f3;
+        }
+        
+        .game-controls {
+            margin-top: 20px;
+        }
+        
+        .game-controls button {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .game-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .game-id-display {
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title">Chess For My Bachas</h1>
+        <p style="font-size: 1.2em; color: #666; margin-bottom: 30px;">🌐 Multiplayer Online Chess</p>
+        
+        <!-- Connection Controls -->
+        <div id="connectionControls" class="multiplayer-controls">
+            <div class="player-input">
+                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+                <button onclick="createGame()" class="btn btn-primary">Create New Game</button>
+                <input type="text" id="gameIdInput" placeholder="Game ID to join" maxlength="8">
+                <button onclick="joinGame()" class="btn btn-secondary">Join Game</button>
+            </div>
+            <p style="color: #666; margin: 0;">Create a new game or enter a Game ID to join an existing game</p>
+        </div>
+        
+        <!-- Game ID Display -->
+        <div id="gameIdDisplay" class="game-id-display hidden">
+            Game ID: <span id="currentGameId"></span>
+            <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: normal;">Share this ID with your friend to play together!</p>
+        </div>
+        
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status status-waiting hidden">
+            Connecting...
+        </div>
+        
+        <!-- Player Information -->
+        <div id="playerInfo" class="player-info hidden">
+            <div id="whitePlayer" class="player-card white">
+                <h3>⚪ White Player</h3>
+                <p id="whitePlayerName">Waiting...</p>
+            </div>
+            <div id="blackPlayer" class="player-card black">
+                <h3>⚫ Black Player</h3>
+                <p id="blackPlayerName">Waiting...</p>
+            </div>
+        </div>
+        
+        <!-- Chess Board -->
+        <div id="chessBoard" class="chess-board hidden"></div>
+        
+        <!-- Game Information -->
+        <div id="gameInfo" class="game-info hidden">
+            <div id="currentTurn" class="current-turn">Waiting for players...</div>
+            <div class="game-controls">
+                <button onclick="newGame()">New Game</button>
+                <button onclick="leaveGame()">Leave Game</button>
+            </div>
+        </div>
+        
+        <!-- Notification container -->
+        <div id="notification" class="notification">
+            <div class="notification-header" id="notificationHeader"></div>
+            <div class="notification-content" id="notificationContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameId = null;
+        let playerName = '';
+        let playerColor = null;
+        let currentPlayer = 'white';
+        let selectedSquare = null;
+        let boardData = [];
+        let gamePollingInterval = null;
+        let lastMoveTime = 0;
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('playerName').focus();
+        });
+        
+        // Create new game
+        async function createGame() {
+            playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/chess/multiplayer/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player_name: playerName })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    gameId = data.game_id;
+                    playerColor = data.player_color;
+                    
+                    document.getElementById('currentGameId').textContent = gameId;
+                    document.getElementById('gameIdDisplay').classList.remove('hidden');
+                    document.getElementById('connectionControls').classList.add('hidden');
+                    
+                    updateConnectionStatus('Game created! Waiting for opponent...', 'waiting');
+                    showGameElements();
+                    startGamePolling();
+                } else {
+                    alert('Failed to create game: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error creating game: ' + error.message);
+            }
+        }
+        
+        // Join existing game
+        async function joinGame() {
+            playerName = document.getElementById('playerName').value.trim();
+            const gameIdToJoin = document.getElementById('gameIdInput').value.trim();
+            
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+            
+            if (!gameIdToJoin) {
+                alert('Please enter a Game ID!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/chess/multiplayer/join/' + gameIdToJoin, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player_name: playerName })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    gameId = data.game_id;
+                    playerColor = data.player_color;
+                    
+                    document.getElementById('currentGameId').textContent = gameId;
+                    document.getElementById('gameIdDisplay').classList.remove('hidden');
+                    document.getElementById('connectionControls').classList.add('hidden');
+                    
+                    updateConnectionStatus('Joined game! Both players ready.', 'connected');
+                    updatePlayerNames(data.opponent_name, playerName);
+                    showGameElements();
+                    startGamePolling();
+                } else {
+                    alert('Failed to join game: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error joining game: ' + error.message);
+            }
+        }
+        
+        // Start polling for game updates
+        function startGamePolling() {
+            if (gamePollingInterval) clearInterval(gamePollingInterval);
+            
+            gamePollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/chess/multiplayer/' + gameId + '/status');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Check if board has changed
+                        if (data.last_move_time > lastMoveTime) {
+                            updateBoard(data.board);
+                            currentPlayer = data.current_player;
+                            updateCurrentTurn();
+                            
+                            // Show move notification if it's a new move from opponent
+                            if (lastMoveTime > 0 && data.current_player !== playerColor) {
+                                const opponentColor = playerColor === 'white' ? 'black' : 'white';
+                                const opponentName = data.players[opponentColor];
+                                showNotification(
+                                    opponentColor.charAt(0).toUpperCase() + opponentColor.slice(1) + ' Move',
+                                    opponentName + ' made a move!',
+                                    opponentColor
+                                );
+                            }
+                            
+                            lastMoveTime = data.last_move_time;
+                        }
+                        
+                        // Update player info if both players are connected
+                        if (data.game_ready && data.players.white && data.players.black) {
+                            updatePlayerNames(data.players.white, data.players.black);
+                            if (document.getElementById('connectionStatus').textContent.includes('Waiting')) {
+                                updateConnectionStatus('Both players connected! Game ready.', 'connected');
+                                showNotification('Game Ready!', 'Both players are connected. Let the game begin!', 'game');
+                            }
+                        }
+                        
+                        // Check for game over
+                        if (data.game_status && data.game_status !== 'ongoing') {
+                            showNotification('Game Over!', data.game_status, 'game');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 1000); // Poll every second
+        }
+        
+        // Make a move
+        async function makeMove(from, to) {
+            if (!gameId || currentPlayer !== playerColor) return false;
+            
+            try {
+                const response = await fetch('/api/chess/multiplayer/' + gameId + '/move', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        from: from,
+                        to: to,
+                        player_color: playerColor
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    updateBoard(data.board);
+                    currentPlayer = data.current_player;
+                    updateCurrentTurn();
+                    lastMoveTime = data.last_move_time;
+                    return true;
+                } else {
+                    showNotification('Invalid Move', data.error, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showNotification('Error', 'Failed to make move: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(message, type) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'connection-status status-' + type;
+            statusEl.classList.remove('hidden');
+        }
+        
+        // Update player names
+        function updatePlayerNames(whiteName, blackName) {
+            document.getElementById('whitePlayerName').textContent = whiteName;
+            document.getElementById('blackPlayerName').textContent = blackName;
+        }
+        
+        // Show game elements
+        function showGameElements() {
+            document.getElementById('playerInfo').classList.remove('hidden');
+            document.getElementById('chessBoard').classList.remove('hidden');
+            document.getElementById('gameInfo').classList.remove('hidden');
+        }
+        
+        // Update current turn display
+        function updateCurrentTurn() {
+            const turnEl = document.getElementById('currentTurn');
+            const isMyTurn = currentPlayer === playerColor;
+            const turnText = isMyTurn ? "Your Turn!" : currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1) + "'s Turn";
+            turnEl.textContent = turnText + ' (You are ' + playerColor + ')';
+            
+            // Update player card active state
+            document.getElementById('whitePlayer').classList.toggle('active', currentPlayer === 'white');
+            document.getElementById('blackPlayer').classList.toggle('active', currentPlayer === 'black');
+        }
+        
+        // Update chess board
+        function updateBoard(boardString) {
+            boardData = [];
+            const lines = boardString.trim().split('\\n');
+            
+            for (let i = 0; i < 8; i++) {
+                boardData[i] = [];
+                const line = lines[i] || '';
+                for (let j = 0; j < 8; j++) {
+                    boardData[i][j] = line[j] || ' ';
+                }
+            }
+            
+            renderBoard();
+        }
+        
+        // Render chess board
+        function renderBoard() {
+            const boardEl = document.getElementById('chessBoard');
+            boardEl.innerHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = 'square ' + ((row + col) % 2 === 0 ? 'light' : 'dark');
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+                    square.onclick = handleSquareClick;
+                    
+                    const piece = boardData[row][col];
+                    if (piece !== ' ') {
+                        square.textContent = getPieceSymbol(piece);
+                    }
+                    
+                    boardEl.appendChild(square);
+                }
+            }
+        }
+        
+        // Get piece Unicode symbol
+        function getPieceSymbol(piece) {
+            const symbols = {
+                'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+                'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+            };
+            return symbols[piece] || piece;
+        }
+        
+        // Handle square click
+        function handleSquareClick(event) {
+            if (!gameId || currentPlayer !== playerColor) {
+                if (currentPlayer !== playerColor) {
+                    showNotification('Not Your Turn', "Wait for your opponent's move", 'error');
+                }
+                return;
+            }
+            
+            const square = event.currentTarget;
+            const row = parseInt(square.dataset.row);
+            const col = parseInt(square.dataset.col);
+            
+            if (selectedSquare) {
+                // Make move
+                const fromPos = positionToAlgebraic(selectedSquare.row, selectedSquare.col);
+                const toPos = positionToAlgebraic(row, col);
+                
+                makeMove(fromPos, toPos).then(success => {
+                    if (success) {
+                        clearSelection();
+                    }
+                });
+            } else {
+                // Select piece (only if it's the player's piece)
+                const piece = boardData[row][col];
+                if (piece !== ' ') {
+                    const isWhitePiece = piece === piece.toUpperCase();
+                    if ((playerColor === 'white' && isWhitePiece) || (playerColor === 'black' && !isWhitePiece)) {
+                        selectedSquare = { row: row, col: col };
+                        square.classList.add('selected');
+                    }
+                }
+            }
+        }
+        
+        // Clear selection
+        function clearSelection() {
+            selectedSquare = null;
+            document.querySelectorAll('.square').forEach(function(sq) {
+                sq.classList.remove('selected');
+            });
+        }
+        
+        // Convert position to algebraic notation
+        function positionToAlgebraic(row, col) {
+            const file = String.fromCharCode(97 + col); // a-h
+            const rank = 8 - row; // 8-1
+            return file + rank;
+        }
+        
+        // Show notification
+        function showNotification(header, content, type) {
+            const notification = document.getElementById('notification');
+            const headerEl = document.getElementById('notificationHeader');
+            const contentEl = document.getElementById('notificationContent');
+            
+            headerEl.textContent = header;
+            contentEl.textContent = content;
+            
+            // Remove existing type classes
+            notification.classList.remove('white-move', 'black-move');
+            
+            // Add type-specific class
+            if (type === 'white') {
+                notification.classList.add('white-move');
+            } else if (type === 'black') {
+                notification.classList.add('black-move');
+            }
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Hide after 4 seconds
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+        
+        // New game function
+        function newGame() {
+            if (confirm('Start a new game? This will create a fresh game.')) {
+                leaveGame();
+                document.getElementById('connectionControls').classList.remove('hidden');
+                document.getElementById('gameIdDisplay').classList.add('hidden');
+            }
+        }
+        
+        // Leave game function
+        function leaveGame() {
+            if (gamePollingInterval) {
+                clearInterval(gamePollingInterval);
+                gamePollingInterval = null;
+            }
+            
+            gameId = null;
+            playerColor = null;
+            selectedSquare = null;
+            boardData = [];
+            
+            document.getElementById('connectionControls').classList.remove('hidden');
+            document.getElementById('gameIdDisplay').classList.add('hidden');
+            document.getElementById('connectionStatus').classList.add('hidden');
+            document.getElementById('playerInfo').classList.add('hidden');
+            document.getElementById('chessBoard').classList.add('hidden');
+            document.getElementById('gameInfo').classList.add('hidden');
+            
+            // Clear inputs
+            document.getElementById('playerName').value = '';
+            document.getElementById('gameIdInput').value = '';
+        }
+    </script>
+</body>
+</html>
+"""
+
 def add_chess_routes(app):
     """Add chess game routes to Flask app"""
     
@@ -879,3 +1643,148 @@ def add_chess_routes(app):
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+    # Multiplayer Chess API Endpoints
+    @app.route('/api/chess/multiplayer/create', methods=['POST'])
+    def create_multiplayer_game():
+        """Create a new multiplayer chess game"""
+        try:
+            cleanup_old_sessions()
+            
+            game_id = str(uuid.uuid4())[:8]  # Short game ID
+            player_name = request.json.get('player_name', 'Player 1')
+            
+            game_sessions[game_id] = {
+                'game': ChessGame(),
+                'players': {
+                    'white': {'name': player_name, 'last_seen': time.time()},
+                    'black': None
+                },
+                'created_at': time.time(),
+                'last_move_time': time.time()
+            }
+            session_cleanup_time[game_id] = time.time()
+            
+            return jsonify({
+                'success': True,
+                'game_id': game_id,
+                'player_color': 'white',
+                'player_name': player_name,
+                'waiting_for_opponent': True
+            })
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/chess/multiplayer/join/<game_id>', methods=['POST'])
+    def join_multiplayer_game(game_id):
+        """Join an existing multiplayer chess game"""
+        try:
+            cleanup_old_sessions()
+            
+            if game_id not in game_sessions:
+                return jsonify({'success': False, 'error': 'Game not found'}), 404
+            
+            player_name = request.json.get('player_name', 'Player 2')
+            game_session = game_sessions[game_id]
+            
+            # Check if game is full
+            if game_session['players']['black'] is not None:
+                return jsonify({'success': False, 'error': 'Game is full'}), 400
+            
+            # Add black player
+            game_session['players']['black'] = {
+                'name': player_name, 
+                'last_seen': time.time()
+            }
+            
+            return jsonify({
+                'success': True,
+                'game_id': game_id,
+                'player_color': 'black',
+                'player_name': player_name,
+                'opponent_name': game_session['players']['white']['name'],
+                'game_ready': True
+            })
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/chess/multiplayer/<game_id>/status', methods=['GET'])
+    def get_multiplayer_game_status(game_id):
+        """Get current status of a multiplayer game"""
+        try:
+            cleanup_old_sessions()
+            
+            if game_id not in game_sessions:
+                return jsonify({'success': False, 'error': 'Game not found'}), 404
+            
+            game_session = game_sessions[game_id]
+            game = game_session['game']
+            
+            return jsonify({
+                'success': True,
+                'board': game.board.board_to_string(),
+                'current_player': game.current_player,
+                'game_status': game.get_game_status(),
+                'move_count': game.move_count,
+                'players': {
+                    'white': game_session['players']['white']['name'] if game_session['players']['white'] else None,
+                    'black': game_session['players']['black']['name'] if game_session['players']['black'] else None
+                },
+                'game_ready': game_session['players']['black'] is not None,
+                'last_move_time': game_session['last_move_time']
+            })
+            
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @app.route('/api/chess/multiplayer/<game_id>/move', methods=['POST'])
+    def make_multiplayer_move(game_id):
+        """Make a move in a multiplayer game"""
+        try:
+            cleanup_old_sessions()
+            
+            if game_id not in game_sessions:
+                return jsonify({'success': False, 'error': 'Game not found'}), 404
+            
+            game_session = game_sessions[game_id]
+            game = game_session['game']
+            
+            from_pos = request.json.get('from')
+            to_pos = request.json.get('to')
+            player_color = request.json.get('player_color')
+            
+            # Validate it's the player's turn
+            if player_color != game.current_player:
+                return jsonify({'success': False, 'error': 'Not your turn'}), 400
+            
+            # Convert positions
+            from_position = Position.from_algebraic(from_pos)
+            to_position = Position.from_algebraic(to_pos)
+            
+            # Make the move
+            result = game.make_move(from_position, to_position)
+            
+            if result['success']:
+                game_session['last_move_time'] = time.time()
+                
+                return jsonify({
+                    'success': True,
+                    'board': game.board.board_to_string(),
+                    'current_player': game.current_player,
+                    'game_status': game.get_game_status(),
+                    'move_count': game.move_count,
+                    'move_notation': result.get('move_notation', ''),
+                    'last_move_time': game_session['last_move_time']
+                })
+            else:
+                return jsonify({'success': False, 'error': result.get('message', 'Invalid move')}), 400
+                
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    @app.route('/chess/multiplayer')
+    def multiplayer_chess():
+        """Multiplayer chess game page"""
+        return render_template_string(MULTIPLAYER_CHESS_TEMPLATE)

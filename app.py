@@ -48,6 +48,10 @@ HOME_TEMPLATE = """
             <p>🎮 <a href="/chess">Play Chess Online!</a></p>
         </div>
         <div class="endpoint">
+            <h3>GET /chess/multiplayer</h3>
+            <p>🌐 <a href="/chess/multiplayer">Play Multiplayer Chess!</a> - Share Game ID to play with friends</p>
+        </div>
+        <div class="endpoint">
             <h3>GET /api/health</h3>
             <p>Health check endpoint</p>
         </div>
