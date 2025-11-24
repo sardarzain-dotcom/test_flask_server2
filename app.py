@@ -6,11 +6,16 @@ app = Flask(__name__)
 # Import chess web interface
 try:
     from chess_web import add_chess_routes
+    print("Successfully imported add_chess_routes")
     add_chess_routes(app)
+    print("Successfully added chess routes to app")
     CHESS_AVAILABLE = True
 except ImportError as e:
     CHESS_AVAILABLE = False
     print(f"Chess game not available: {e}")
+except Exception as e:
+    CHESS_AVAILABLE = False
+    print(f"Error adding chess routes: {e}")
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
@@ -46,6 +51,10 @@ HOME_TEMPLATE = """
         <div class="endpoint">
             <h3>GET /chess</h3>
             <p>🎮 <a href="/chess">Play Chess Online!</a></p>
+        </div>
+        <div class="endpoint">
+            <h3>GET /chess/ai</h3>
+            <p>🤖 <a href="/chess/ai">Play vs AI</a> - Choose side and difficulty</p>
         </div>
         <div class="endpoint">
             <h3>GET /chess/multiplayer</h3>
@@ -114,6 +123,12 @@ def app_info():
             'region': 'us-central1'
         }
     })
+
+@app.route('/test')
+def test_button():
+    """Test button page"""
+    with open('test_button.html', 'r') as f:
+        return f.read()
 
 @app.errorhandler(404)
 def not_found(error):

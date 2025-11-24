@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Test</title>
+</head>
+<body>
+    <input type="text" id="playerName" placeholder="Enter your name" value="Test Player">
+    <button id="createGameBtn" onclick="testClick()">Create New Game</button>
+    
+    <script>
+        function testClick() {
+            alert('Button clicked! Name: ' + document.getElementById('playerName').value);
+        }
+        
+        // Test with event listener too
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready');
+            const btn = document.getElementById('createGameBtn');
+            if (btn) {
+                console.log('Button found');
+                btn.addEventListener('click', function() {
+                    console.log('Event listener triggered');
+                });
+            } else {
+                console.log('Button not found');
+            }
+        });
+    </script>
+</body>
+</html>
