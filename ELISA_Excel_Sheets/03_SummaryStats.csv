@@ -1,0 +1,9 @@
+Group,Marker,NominalTime,Concentration_count,Concentration_mean,Concentration_std,Concentration_min,Concentration_max,Concentration_median,age_mean,bmi_mean
+Active,CRP,Baseline,8,1.335,0.545,0.73,2.18,1.29,61.625,27.425
+Active,CRP,Week 4,8,1.372,0.503,0.88,2.38,1.31,61.625,27.425
+Active,IL-6,Baseline,8,3.856,1.564,1.52,5.44,4.54,61.625,27.425
+Active,IL-6,Week 4,8,3.462,1.2,2.02,5.3,3.39,61.625,27.425
+Placebo,CRP,Baseline,7,1.253,0.667,0.27,2.12,1.22,59.0,29.8
+Placebo,CRP,Week 4,7,1.799,0.216,1.53,2.08,1.78,59.0,29.8
+Placebo,IL-6,Baseline,7,3.079,2.205,0.59,5.35,2.83,59.0,29.8
+Placebo,IL-6,Week 4,7,3.047,1.575,0.91,5.35,2.46,59.0,29.8

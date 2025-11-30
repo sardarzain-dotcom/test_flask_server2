@@ -1,0 +1,47 @@
+[
+  {
+    "SubjectID": "P001",
+    "Group": "Treatment A",
+    "Marker": "TNF-alpha",
+    "Concentration": 125.5,
+    "Timepoint": "Baseline",
+    "Age": 45,
+    "Gender": "Male"
+  },
+  {
+    "SubjectID": "P001",
+    "Group": "Treatment A", 
+    "Marker": "TNF-alpha",
+    "Concentration": 98.3,
+    "Timepoint": "Week 2",
+    "Age": 45,
+    "Gender": "Male"
+  },
+  {
+    "SubjectID": "P002",
+    "Group": "Control",
+    "Marker": "IL-8",
+    "Concentration": 87.2,
+    "Timepoint": "Baseline",
+    "Age": 52,
+    "Gender": "Female"
+  },
+  {
+    "SubjectID": "P002",
+    "Group": "Control",
+    "Marker": "IL-8", 
+    "Concentration": 92.1,
+    "Timepoint": "Week 2",
+    "Age": 52,
+    "Gender": "Female"
+  },
+  {
+    "SubjectID": "P003",
+    "Group": "Treatment B",
+    "Marker": "VEGF",
+    "Concentration": 234.7,
+    "Timepoint": "Baseline",
+    "Age": 38,
+    "Gender": "Male"
+  }
+]

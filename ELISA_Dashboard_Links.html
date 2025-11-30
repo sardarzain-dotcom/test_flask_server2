@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 ELISA Dashboard Links</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .link-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+        .status {
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .url-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 ELISA Dashboard Access</h1>
+        
+        <div class="status">
+            <h3>🟢 Dashboard Status: READY</h3>
+            <p>Your ELISA Biomarker Analysis Dashboard is running!</p>
+        </div>
+
+        <h2>🚀 Quick Access Links</h2>
+        <p>Click any link below to open the dashboard:</p>
+        
+        <a href="http://localhost:8501" class="link-button" target="_blank">
+            📊 Main Dashboard (Port 8501)
+        </a>
+        
+        <a href="http://localhost:8502" class="link-button" target="_blank">
+            🔄 Alternative Port (8502)
+        </a>
+        
+        <a href="http://127.0.0.1:8501" class="link-button" target="_blank">
+            🌐 Local IP Access
+        </a>
+
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li><strong>If dashboard is already running:</strong> Click any link above</li>
+                <li><strong>If dashboard is not running:</strong> Open terminal and run:</li>
+            </ol>
+            
+            <div class="url-box">
+                streamlit run elisa_streamlit_dashboard.py
+            </div>
+            
+            <p><strong>Dashboard URLs:</strong></p>
+            <div class="url-box">
+                Primary: http://localhost:8501<br>
+                Alternative: http://localhost:8502<br>
+                Local IP: http://127.0.0.1:8501
+            </div>
+            
+            <h4>🎯 Dashboard Features:</h4>
+            <ul>
+                <li>📊 Interactive biomarker concentration plots</li>
+                <li>📈 Longitudinal analysis and change tracking</li>
+                <li>🎯 Responder identification (≥20% reduction)</li>
+                <li>👥 Demographics and subject characteristics</li>
+                <li>🔬 Statistical analysis with t-tests and correlations</li>
+                <li>📡 Raw signal analysis and QC monitoring</li>
+                <li>💊 Dose-response analysis</li>
+                <li>🔬 Quality control and assay validation</li>
+            </ul>
+        </div>
+
+        <div class="status">
+            <p><strong>📁 Data Location:</strong> c:\Users\sarda\Git\test_flask_server2\</p>
+            <p><strong>📊 Analysis Files:</strong> All ELISA data processed and ready</p>
+            <p><strong>🧬 Biomarkers:</strong> IL-6, CRP (60 measurements, 15 subjects)</p>
+        </div>
+
+        <p style="margin-top: 30px; opacity: 0.8;">
+            <small>🧬 ELISA Biomarker Analysis Dashboard • Built with Streamlit & Plotly • © 2025</small>
+        </p>
+    </div>
+
+    <script>
+        // Auto-refresh page status every 30 seconds
+        setTimeout(function() {
+            // Check if any dashboard links are accessible
+            fetch('http://localhost:8501')
+                .then(response => {
+                    if (response.ok) {
+                        document.querySelector('.status h3').innerHTML = '🟢 Dashboard Status: ONLINE & READY';
+                    }
+                })
+                .catch(() => {
+                    document.querySelector('.status h3').innerHTML = '🟡 Dashboard Status: LAUNCH REQUIRED';
+                });
+        }, 2000);
+    </script>
+</body>
+</html>

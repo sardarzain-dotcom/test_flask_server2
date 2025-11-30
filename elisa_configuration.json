@@ -1,0 +1,132 @@
+{
+  "processing_info": {
+    "timestamp": "2025-11-26T20:13:18.354361",
+    "original_file": "c:\\Users\\sarda\\Downloads\\ELISA15_Combined.csv",
+    "processed_shape": [
+      60,
+      23
+    ],
+    "columns": [
+      "MeasurementID",
+      "AssayRunID",
+      "SampleID",
+      "SubjectID",
+      "Marker",
+      "AnalyteID",
+      "Replicate",
+      "RawSignal",
+      "Concentration",
+      "Units",
+      "MeasurementTime",
+      "Matrix",
+      "NominalTime",
+      "ActualTime",
+      "CollectionDateTime",
+      "StudyID",
+      "Group",
+      "DoseLevel",
+      "age",
+      "sex",
+      "bmi",
+      "well",
+      "flag"
+    ]
+  },
+  "data_summary": {
+    "total_subjects": 15,
+    "total_measurements": 60,
+    "biomarkers": [
+      "IL-6",
+      "CRP"
+    ],
+    "study_groups": [
+      "Active",
+      "Placebo"
+    ],
+    "time_points": [
+      "Baseline",
+      "Week 4"
+    ]
+  },
+  "demographics": {
+    "age_statistics": {
+      "mean": 60.4,
+      "std": 8.82062298426299,
+      "min": 45.0,
+      "max": 74.0
+    },
+    "sex_distribution": {
+      "F": 44,
+      "M": 16
+    },
+    "bmi_statistics": {
+      "mean": 28.533333333333324,
+      "std": 3.276142143532965,
+      "min": 22.2,
+      "max": 33.6
+    }
+  },
+  "biomarker_analysis": {
+    "concentration_ranges": {
+      "IL-6": {
+        "min": 0.59,
+        "max": 5.44,
+        "mean": 3.381,
+        "std": 1.6031141031087608
+      },
+      "CRP": {
+        "min": 0.27,
+        "max": 2.38,
+        "mean": 1.4340000000000004,
+        "std": 0.5277904495353147
+      }
+    },
+    "group_comparisons": {
+      "Active": {
+        "subjects": 8,
+        "mean_age": 61.625,
+        "mean_bmi": 27.424999999999997
+      },
+      "Placebo": {
+        "subjects": 7,
+        "mean_age": 59.0,
+        "mean_bmi": 29.800000000000004
+      }
+    }
+  },
+  "quality_control": {
+    "flag_distribution": {
+      "OK": 60
+    },
+    "missing_values": {
+      "MeasurementID": 0,
+      "AssayRunID": 0,
+      "SampleID": 0,
+      "SubjectID": 0,
+      "Marker": 0,
+      "AnalyteID": 0,
+      "Replicate": 0,
+      "RawSignal": 0,
+      "Concentration": 0,
+      "Units": 0,
+      "MeasurementTime": 0,
+      "Matrix": 0,
+      "NominalTime": 0,
+      "ActualTime": 0,
+      "CollectionDateTime": 0,
+      "StudyID": 0,
+      "Group": 0,
+      "DoseLevel": 0,
+      "age": 0,
+      "sex": 0,
+      "bmi": 0,
+      "well": 0,
+      "flag": 0
+    }
+  },
+  "files_created": [
+    "elisa_processed_data.csv",
+    "elisa_pivot_table.csv",
+    "elisa_configuration.json"
+  ]
+}

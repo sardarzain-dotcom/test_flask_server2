@@ -1,0 +1,5 @@
+Group,Marker,Responder_20pct_sum,Responder_20pct_count,Percent_Change_mean,Percent_Change_std,Response_Rate
+Active,CRP,3,8,22.81,70.19,37.5
+Active,IL-6,3,8,12.96,76.75,37.5
+Placebo,CRP,0,7,116.47,193.29,0.0
+Placebo,IL-6,3,7,60.43,133.46,42.9

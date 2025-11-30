@@ -1,0 +1,17 @@
+{
+  "analysis_timestamp": "2025-11-26T20:37:02.019348",
+  "data_summary": {
+    "total_subjects": 15,
+    "total_measurements": 60,
+    "biomarkers": [
+      "IL-6",
+      "CRP"
+    ],
+    "groups": [
+      "Active",
+      "Placebo"
+    ]
+  },
+  "descriptive_statistics": {
+    "Count": {
+      

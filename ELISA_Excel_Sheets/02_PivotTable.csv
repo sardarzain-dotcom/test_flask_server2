@@ -1,0 +1,18 @@
+Marker,,CRP,CRP,IL-6,IL-6
+NominalTime,,Baseline,Week 4,Baseline,Week 4
+SubjectID,Group,,,,
+SUBJ001,Active,2.18,0.88,1.52,2.42
+SUBJ002,Active,0.8,1.38,5.44,2.42
+SUBJ003,Active,1.69,1.24,1.53,4.21
+SUBJ004,Active,1.8,1.55,5.22,4.55
+SUBJ005,Active,0.73,0.89,4.45,2.02
+SUBJ006,Active,1.59,0.99,4.63,5.3
+SUBJ007,Active,0.9,1.67,3.37,3.98
+SUBJ008,Active,0.99,2.38,4.69,2.8
+SUBJ009,Placebo,1.49,1.93,5.25,3.57
+SUBJ010,Placebo,1.98,2.08,0.72,2.46
+SUBJ011,Placebo,0.98,1.53,5.35,2.36
+SUBJ012,Placebo,0.71,2.01,2.83,1.97
+SUBJ013,Placebo,1.22,1.56,5.31,4.71
+SUBJ014,Placebo,0.27,1.7,1.5,5.35
+SUBJ015,Placebo,2.12,1.78,0.59,0.91

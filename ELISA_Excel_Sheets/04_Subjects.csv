@@ -1,0 +1,16 @@
+SubjectID,Group,age,sex,bmi
+SUBJ001,Active,49,F,32.8
+SUBJ002,Active,72,F,22.2
+SUBJ003,Active,55,M,29.9
+SUBJ004,Active,64,F,29.5
+SUBJ005,Active,74,F,27.4
+SUBJ006,Active,59,F,25.3
+SUBJ007,Active,56,M,26.1
+SUBJ008,Active,64,M,26.2
+SUBJ009,Placebo,58,F,31.6
+SUBJ010,Placebo,72,M,32.6
+SUBJ011,Placebo,68,F,25.4
+SUBJ012,Placebo,45,F,30.3
+SUBJ013,Placebo,65,F,33.6
+SUBJ014,Placebo,48,F,29.5
+SUBJ015,Placebo,57,F,25.6

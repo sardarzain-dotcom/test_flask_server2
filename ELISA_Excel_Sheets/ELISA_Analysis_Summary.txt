@@ -1,0 +1,23 @@
+ELISA Biomarker Analysis Summary
+========================================
+
+Generated: November 27, 2025 at 09:49 AM
+
+Study Overview:
+- Total Subjects: 15
+- Total Measurements: 60
+- Biomarkers: IL-6, CRP
+- Study Groups: Active, Placebo
+- Time Points: Baseline, Week 4
+
+Excel-Compatible Files Created:
+1. 01_ProcessedData.csv - Complete dataset
+2. 02_PivotTable.csv - Biomarker concentrations by subject/time
+3. 03_SummaryStats.csv - Descriptive statistics by group/marker/time
+4. 04_Subjects.csv - Individual subject demographics
+5. 05_LongitudinalChanges.csv - Changes from baseline to week 4
+6. 06_Demographics.csv - Demographic summary by group
+7. 07_Responders.csv - Response analysis (>=20% reduction)
+8. 08_Correlations.csv - Correlation matrix
+
+Note: All CSV files can be imported directly into Excel

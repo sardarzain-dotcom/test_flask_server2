@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ELISA_Data>
+  <Record>
+    <SubjectID>P001</SubjectID>
+    <Group>Treatment A</Group>
+    <Marker>TNF-alpha</Marker>
+    <Concentration>125.5</Concentration>
+    <Timepoint>Baseline</Timepoint>
+    <Age>45</Age>
+    <Gender>Male</Gender>
+  </Record>
+  <Record>
+    <SubjectID>P001</SubjectID>
+    <Group>Treatment A</Group>
+    <Marker>TNF-alpha</Marker>
+    <Concentration>98.3</Concentration>
+    <Timepoint>Week 2</Timepoint>
+    <Age>45</Age>
+    <Gender>Male</Gender>
+  </Record>
+  <Record>
+    <SubjectID>P002</SubjectID>
+    <Group>Control</Group>
+    <Marker>IL-8</Marker>
+    <Concentration>87.2</Concentration>
+    <Timepoint>Baseline</Timepoint>
+    <Age>52</Age>
+    <Gender>Female</Gender>
+  </Record>
+  <Record>
+    <SubjectID>P003</SubjectID>
+    <Group>Treatment B</Group>
+    <Marker>VEGF</Marker>
+    <Concentration>234.7</Concentration>
+    <Timepoint>Baseline</Timepoint>
+    <Age>38</Age>
+    <Gender>Male</Gender>
+  </Record>
+</ELISA_Data>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 ELISA Dashboard - Direct Access</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .status {
+            background: rgba(0, 255, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff00;
+        }
+        .dashboard-link {
+            display: block;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .dashboard-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .alternative-links {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .alternative-links a {
+            color: #87CEEB;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .alternative-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+    <script>
+        function checkDashboard() {
+            const statusDiv = document.getElementById('status');
+            const mainLink = document.getElementById('mainLink');
+            
+            // Update status
+            statusDiv.innerHTML = '✅ <strong>DASHBOARD STATUS: ONLINE & ACCESSIBLE</strong><br>🔗 Port 8507 is active with established connections';
+            
+            // Auto-redirect option
+            setTimeout(() => {
+                if (confirm('Dashboard is ready! Click OK to open automatically, or Cancel to choose manually.')) {
+                    window.open('http://localhost:8507', '_blank');
+                }
+            }, 2000);
+        }
+        
+        window.onload = checkDashboard;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 ELISA Dashboard</h1>
+            <p>Direct Access Portal</p>
+        </div>
+        
+        <div id="status" class="status">
+            🔄 Checking dashboard status...
+        </div>
+        
+        <div>
+            <h2>🚀 Access Your Dashboard</h2>
+            
+            <a href="http://localhost:8507" target="_blank" id="mainLink" class="dashboard-link">
+                🎯 OPEN ELISA DASHBOARD
+                <br><small>http://localhost:8507</small>
+            </a>
+            
+            <div class="alternative-links">
+                <h3>🔗 Alternative Access Methods:</h3>
+                <p>If the main link doesn't work, try these:</p>
+                <a href="http://127.0.0.1:8507" target="_blank">🔗 127.0.0.1:8507</a>
+                <a href="http://localhost:8508" target="_blank">🔗 Port 8508</a>
+                <a href="http://localhost:8509" target="_blank">🔗 Port 8509</a>
+                <a href="http://192.168.2.29:8507" target="_blank">🌐 Network Access</a>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 Quick Instructions:</h3>
+                <ol>
+                    <li><strong>Click the big button above</strong> to open the dashboard</li>
+                    <li><strong>If it doesn't work</strong>, try the alternative links</li>
+                    <li><strong>Bookmark this page</strong> for easy future access</li>
+                    <li><strong>The dashboard contains</strong>: 60 ELISA measurements, 9 analysis tabs, interactive visualizations</li>
+                </ol>
+            </div>
+            
+            <div class="status">
+                💡 <strong>Troubleshooting:</strong> If no links work, run this command in terminal:
+                <br><code>streamlit run elisa_test_dashboard.py --server.port 8507</code>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

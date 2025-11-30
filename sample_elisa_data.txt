@@ -1,0 +1,10 @@
+SubjectID	Group	Marker	Concentration	Timepoint	Age	Gender
+P001	Treatment A	TNF-alpha	125.5	Baseline	45	Male
+P001	Treatment A	TNF-alpha	98.3	Week 2	45	Male
+P002	Control	IL-8	87.2	Baseline	52	Female
+P002	Control	IL-8	92.1	Week 2	52	Female
+P003	Treatment B	VEGF	234.7	Baseline	38	Male
+P003	Treatment B	VEGF	198.4	Week 2	38	Male
+P004	Treatment A	TNF-alpha	110.8	Baseline	29	Female
+P004	Treatment A	TNF-alpha	85.2	Week 2	29	Female
+P005	Control	VEGF	156.3	Baseline	41	Male

@@ -1,15 +1,18 @@
+#!/usr/bin/env python3
+"""
+🧬 ELISA Dashboard Launcher
+===========================
+Simple launcher for the ELISA Biomarker Analysis Dashboard
+"""
+
 import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import time
+import os
+from datetime import datetime
 
 # Set page config
 st.set_page_config(
-    page_title="Streamlit Demo App",
-    page_icon="🚀",
+    page_title="🧬 ELISA Dashboard Launcher",
+    page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -19,333 +22,212 @@ st.markdown("""
 <style>
     .main-header {
         font-size: 3rem;
-        color: #1f77b4;
+        color: #2E8B57;
         text-align: center;
         margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
-    .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 2rem 0;
+        text-align: center;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .file-box {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 1.5rem;
         border-radius: 0.5rem;
-        margin: 0.5rem 0;
+        margin: 1rem 0;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 2px;
+    .status-good {
+        color: #28a745;
+        font-weight: bold;
     }
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        padding-left: 20px;
-        padding-right: 20px;
+    .status-missing {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .command-box {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0 0.25rem 0.25rem 0;
+        font-family: 'Courier New', monospace;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Main title
-st.markdown('<h1 class="main-header">🚀 Streamlit Demo Application</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🧬 ELISA Analysis Dashboard Hub</h1>', unsafe_allow_html=True)
 
-# Sidebar
+# Check for data files
+def check_data_files():
+    base_path = r"c:\Users\sarda\Git\test_flask_server2"
+    
+    files_to_check = {
+        'Main Data': 'elisa_processed_data.csv',
+        'Dashboard Script': 'elisa_streamlit_dashboard.py',
+        'Excel Sheets': 'ELISA_Excel_Sheets'
+    }
+    
+    status = {}
+    for name, file_path in files_to_check.items():
+        full_path = os.path.join(base_path, file_path)
+        status[name] = os.path.exists(full_path)
+    
+    return status
+
+# Information box
+st.markdown("""
+<div class="info-box">
+    <h2>🎯 Welcome to the ELISA Biomarker Analysis Dashboard</h2>
+    <p>This comprehensive dashboard provides interactive visualization and statistical analysis of your ELISA biomarker data.</p>
+    <p><strong>Features:</strong> Concentration plots, longitudinal analysis, responder analysis, demographics, and statistical testing</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Check data status
+st.header("📊 Data Status Check")
+status = check_data_files()
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    status_text = "✅ Available" if status['Main Data'] else "❌ Missing"
+    status_class = "status-good" if status['Main Data'] else "status-missing"
+    st.markdown(f'<p class="{status_class}">Main Data: {status_text}</p>', unsafe_allow_html=True)
+
+with col2:
+    status_text = "✅ Available" if status['Dashboard Script'] else "❌ Missing"
+    status_class = "status-good" if status['Dashboard Script'] else "status-missing"
+    st.markdown(f'<p class="{status_class}">Dashboard: {status_text}</p>', unsafe_allow_html=True)
+
+with col3:
+    status_text = "✅ Available" if status['Excel Sheets'] else "❌ Missing"
+    status_class = "status-good" if status['Excel Sheets'] else "status-missing"
+    st.markdown(f'<p class="{status_class}">Excel Files: {status_text}</p>', unsafe_allow_html=True)
+
+if all(status.values()):
+    st.success("🎉 All required files are available! You can launch the dashboard.")
+    
+    # Launch instructions
+    st.header("🚀 Launch Dashboard")
+    
+    st.markdown("""
+    <div class="command-box">
+        <strong>To launch the ELISA Dashboard, run this command in your terminal:</strong><br><br>
+        <code>streamlit run elisa_streamlit_dashboard.py</code><br><br>
+        <strong>The dashboard will open at:</strong><br>
+        <code>http://localhost:8501</code><br><br>
+        <strong>If that doesn't work, try:</strong><br>
+        <code>streamlit run elisa_streamlit_dashboard.py --server.port 8502</code><br>
+        <strong>Then visit:</strong> <code>http://localhost:8502</code>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Add a direct clickable link
+    st.markdown("### 🔗 Quick Access")
+    st.markdown("[🚀 Click here when dashboard is running: http://localhost:8501](http://localhost:8501)")
+    st.markdown("[🚀 Alternative port: http://localhost:8502](http://localhost:8502)")
+    
+    # Alternative command
+    st.info("💡 **Alternative:** You can also run `streamlit run streamlit_demo.py` to see this launcher page")
+    
+else:
+    st.error("❌ Some required files are missing. Please ensure you have run the ELISA data analysis first.")
+    
+    st.subheader("📝 Required Steps:")
+    if not status['Main Data']:
+        st.write("1. ❌ Run the ELISA data processing script to generate `elisa_processed_data.csv`")
+    else:
+        st.write("1. ✅ ELISA data processing completed")
+    
+    if not status['Dashboard Script']:
+        st.write("2. ❌ Dashboard script missing - should be auto-created")
+    else:
+        st.write("2. ✅ Dashboard script available")
+    
+    if not status['Excel Sheets']:
+        st.write("3. ❌ Run the Excel conversion to generate analysis sheets")
+    else:
+        st.write("3. ✅ Excel sheets available")
+
+# Dashboard features
+st.header("🎨 Dashboard Features")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("""
+    <div class="file-box">
+        <h3>📊 Visualization Features</h3>
+        <ul style="text-align: left;">
+            <li>Interactive concentration plots</li>
+            <li>Box plots and violin plots</li>
+            <li>Individual subject trajectories</li>
+            <li>Correlation heatmaps</li>
+            <li>Response distribution charts</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="file-box">
+        <h3>🔬 Analysis Features</h3>
+        <ul style="text-align: left;">
+            <li>Statistical t-tests between groups</li>
+            <li>Effect size calculations (Cohen's d)</li>
+            <li>Responder analysis (≥20% reduction)</li>
+            <li>Demographic summaries</li>
+            <li>Longitudinal change tracking</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+# File locations
+st.header("📂 File Locations")
+st.write("**Project Directory:** `c:\\Users\\sarda\\Git\\test_flask_server2`")
+st.write("**Main Data:** `elisa_processed_data.csv`")
+st.write("**Dashboard Script:** `elisa_streamlit_dashboard.py`")
+st.write("**Excel Files:** `ELISA_Excel_Sheets/` folder")
+st.write("**Downloads:** `Downloads/ELISA_Excel_Sheets/` folder")
+
+# Sidebar info
 with st.sidebar:
-    st.header("🎛️ Controls")
-    
-    # User input controls
-    user_name = st.text_input("Enter your name:", value="User")
-    favorite_color = st.selectbox("Choose your favorite color:", 
-                                 ["Blue", "Red", "Green", "Purple", "Orange"])
-    
-    # Slider for data generation
-    data_points = st.slider("Number of data points:", 10, 1000, 100)
-    
-    # Date picker
-    selected_date = st.date_input("Select a date:", datetime.now())
+    st.header("ℹ️ Dashboard Info")
+    st.write("**Created:** November 27, 2025")
+    st.write("**Technology:** Streamlit + Plotly")
+    st.write("**Data Source:** ELISA CSV Analysis")
     
     st.markdown("---")
-    st.markdown("### 📊 Quick Stats")
-    st.metric("Total Users", "1,234", "12%")
-    st.metric("Revenue", "$45.2K", "8.2%")
-    st.metric("Growth Rate", "15.3%", "-2.1%")
-
-# Main content area with tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Charts", "📊 Data", "🎮 Interactive", "🗺️ Maps", "🎯 Widgets"])
-
-with tab1:
-    st.header(f"📈 Charts for {user_name}")
+    st.header("📋 Quick Commands")
     
-    col1, col2 = st.columns(2)
+    st.code("# Install Streamlit if needed\npip install streamlit plotly", language="bash")
+    st.code("# Launch main dashboard\nstreamlit run elisa_streamlit_dashboard.py", language="bash")
+    st.code("# Launch this launcher\nstreamlit run streamlit_demo.py", language="bash")
+    st.code("# Stop dashboard\nCtrl+C in terminal", language="bash")
     
-    with col1:
-        st.subheader("📊 Random Data Visualization")
-        
-        # Generate random data
-        np.random.seed(42)
-        dates = pd.date_range(start='2024-01-01', periods=data_points, freq='D')
-        values = np.cumsum(np.random.randn(data_points)) * 10 + 100
-        
-        df = pd.DataFrame({
-            'Date': dates,
-            'Value': values,
-            'Category': np.random.choice(['A', 'B', 'C'], data_points)
-        })
-        
-        # Line chart
-        fig_line = px.line(df, x='Date', y='Value', 
-                          title=f"Trend Analysis ({data_points} points)",
-                          color_discrete_sequence=[favorite_color.lower()])
-        st.plotly_chart(fig_line, use_container_width=True)
-        
-    with col2:
-        st.subheader("🍰 Category Distribution")
-        
-        # Pie chart
-        category_counts = df['Category'].value_counts()
-        fig_pie = px.pie(values=category_counts.values, 
-                        names=category_counts.index,
-                        title="Category Distribution")
-        st.plotly_chart(fig_pie, use_container_width=True)
-    
-    # Bar chart spanning full width
-    st.subheader("📊 Monthly Summary")
-    monthly_data = df.groupby(df['Date'].dt.month)['Value'].mean().reset_index()
-    monthly_data['Month'] = monthly_data['Date'].apply(lambda x: pd.to_datetime(f"2024-{x:02d}-01").strftime('%B'))
-    
-    fig_bar = px.bar(monthly_data, x='Month', y='Value',
-                    title="Average Values by Month",
-                    color='Value',
-                    color_continuous_scale='viridis')
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-with tab2:
-    st.header("📊 Data Analysis")
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.subheader("📋 Sample Dataset")
-        
-        # Create sample data
-        sample_data = pd.DataFrame({
-            'Name': [f'Person {i}' for i in range(1, 21)],
-            'Age': np.random.randint(20, 65, 20),
-            'Salary': np.random.randint(30000, 120000, 20),
-            'Department': np.random.choice(['Engineering', 'Marketing', 'Sales', 'HR'], 20),
-            'Experience': np.random.randint(0, 20, 20)
-        })
-        
-        # Display data with search and filtering
-        st.dataframe(sample_data, use_container_width=True)
-        
-        # Download button
-        csv = sample_data.to_csv(index=False)
-        st.download_button(
-            label="📥 Download CSV",
-            data=csv,
-            file_name=f'sample_data_{datetime.now().strftime("%Y%m%d")}.csv',
-            mime='text/csv'
-        )
-    
-    with col2:
-        st.subheader("📈 Data Statistics")
-        
-        # Statistics
-        st.metric("Average Age", f"{sample_data['Age'].mean():.1f} years")
-        st.metric("Average Salary", f"${sample_data['Salary'].mean():,.0f}")
-        st.metric("Total Records", len(sample_data))
-        
-        # Department breakdown
-        st.subheader("🏢 Department Breakdown")
-        dept_counts = sample_data['Department'].value_counts()
-        for dept, count in dept_counts.items():
-            st.write(f"**{dept}:** {count} people")
-
-with tab3:
-    st.header("🎮 Interactive Elements")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("🎯 Real-time Updates")
-        
-        # Placeholder for real-time data
-        placeholder = st.empty()
-        
-        if st.button("🔄 Start Real-time Updates"):
-            for i in range(10):
-                # Simulate real-time data
-                current_time = datetime.now().strftime("%H:%M:%S")
-                random_value = np.random.randint(1, 100)
-                
-                placeholder.metric(
-                    label="Live Data",
-                    value=f"{random_value}%",
-                    delta=f"{np.random.randint(-10, 10)}%"
-                )
-                time.sleep(1)
-        
-        # Progress bar
-        st.subheader("📊 Progress Tracking")
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-        
-        if st.button("▶️ Run Progress Demo"):
-            for i in range(101):
-                progress_bar.progress(i)
-                status_text.text(f'Progress: {i}%')
-                time.sleep(0.05)
-            st.success("✅ Process completed!")
-    
-    with col2:
-        st.subheader("🎨 Interactive Widgets")
-        
-        # Multiple choice
-        options = st.multiselect(
-            "Choose your interests:",
-            ["Technology", "Sports", "Music", "Travel", "Food", "Art"],
-            default=["Technology", "Music"]
-        )
-        
-        if options:
-            st.write(f"You selected: {', '.join(options)}")
-        
-        # Number input
-        number = st.number_input("Enter a number:", min_value=0, max_value=1000, value=42, step=1)
-        st.write(f"Square of {number} is {number**2}")
-        
-        # Color picker
-        color = st.color_picker("Pick a color:", "#FF6B6B")
-        st.markdown(f'<div style="background-color: {color}; padding: 20px; border-radius: 10px; text-align: center; color: white; font-weight: bold;">Selected Color: {color}</div>', unsafe_allow_html=True)
-        
-        # Rating
-        rating = st.select_slider(
-            "Rate this app:",
-            options=[1, 2, 3, 4, 5],
-            value=4,
-            format_func=lambda x: "⭐" * x
-        )
-        st.write(f"Thanks for rating: {'⭐' * rating}")
-
-with tab4:
-    st.header("🗺️ Maps and Geospatial Data")
-    
-    # Generate random coordinates around major cities
-    cities_data = pd.DataFrame({
-        'city': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego'],
-        'lat': [40.7128, 34.0522, 41.8781, 29.7604, 33.4484, 39.9526, 29.4241, 32.7157],
-        'lon': [-74.0060, -118.2437, -87.6298, -95.3698, -112.0740, -75.1652, -98.4936, -117.1611],
-        'population': [8175000, 3971000, 2695000, 2320000, 1680000, 1584000, 1547000, 1423000]
-    })
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("📍 City Locations")
-        st.map(cities_data[['lat', 'lon']])
-    
-    with col2:
-        st.subheader("🏙️ Population Data")
-        fig_scatter = px.scatter_mapbox(
-            cities_data,
-            lat='lat',
-            lon='lon',
-            size='population',
-            hover_name='city',
-            hover_data={'population': ':,'},
-            zoom=3,
-            height=400,
-            mapbox_style='open-street-map'
-        )
-        st.plotly_chart(fig_scatter, use_container_width=True)
-
-with tab5:
-    st.header("🎯 Advanced Widgets & Features")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("📝 Text Analysis")
-        
-        text_input = st.text_area(
-            "Enter some text to analyze:",
-            value="Streamlit is an amazing framework for building data applications!",
-            height=100
-        )
-        
-        if text_input:
-            word_count = len(text_input.split())
-            char_count = len(text_input)
-            
-            col_a, col_b, col_c = st.columns(3)
-            with col_a:
-                st.metric("Words", word_count)
-            with col_b:
-                st.metric("Characters", char_count)
-            with col_c:
-                st.metric("Lines", text_input.count('\n') + 1)
-        
-        # File uploader
-        st.subheader("📂 File Upload")
-        uploaded_file = st.file_uploader("Choose a file", type=['csv', 'txt', 'json'])
-        
-        if uploaded_file is not None:
-            st.success(f"✅ File '{uploaded_file.name}' uploaded successfully!")
-            st.write(f"File size: {uploaded_file.size} bytes")
-    
-    with col2:
-        st.subheader("🎛️ Advanced Controls")
-        
-        # Time input
-        time_value = st.time_input("Select a time:", datetime.now().time())
-        st.write(f"Selected time: {time_value}")
-        
-        # JSON input
-        json_input = st.text_area(
-            "Enter JSON data:",
-            value='{"name": "John", "age": 30}',
-            height=100
-        )
-        
-        try:
-            import json
-            parsed_json = json.loads(json_input)
-            st.json(parsed_json)
-        except json.JSONDecodeError:
-            st.error("❌ Invalid JSON format")
-        
-        # Code input
-        st.subheader("💻 Code Editor")
-        code = st.text_area(
-            "Enter Python code:",
-            value="print('Hello, Streamlit!')\nx = 5 + 3\nprint(f'Result: {x}')",
-            height=100
-        )
-        
-        if st.button("▶️ Show Code"):
-            st.code(code, language='python')
+    st.markdown("---")
+    st.subheader("🔗 Useful Links")
+    st.write("• [Streamlit Documentation](https://docs.streamlit.io)")
+    st.write("• [Plotly Documentation](https://plotly.com/python/)")
 
 # Footer
 st.markdown("---")
 st.markdown(
-    """
+    f"""
     <div style='text-align: center; color: #666;'>
-        <p>🚀 Built with Streamlit • Made with ❤️ • © 2025</p>
-        <p>Select different options in the sidebar to see the app change in real-time!</p>
+        <p>🧬 ELISA Dashboard Launcher • Generated on {datetime.now().strftime("%B %d, %Y at %I:%M %p")}</p>
+        <p>📊 Ready to visualize your biomarker analysis results!</p>
     </div>
     """,
     unsafe_allow_html=True
 )
-
-# Session state example
-if 'counter' not in st.session_state:
-    st.session_state.counter = 0
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("🔢 Session Counter")
-if st.sidebar.button("➕ Increment Counter"):
-    st.session_state.counter += 1
-
-st.sidebar.write(f"Counter value: {st.session_state.counter}")
-
-# Show some info about the current session
-st.sidebar.markdown("---")
-st.sidebar.subheader("ℹ️ Session Info")
-st.sidebar.write(f"Date: {selected_date}")
-st.sidebar.write(f"User: {user_name}")
-st.sidebar.write(f"Favorite Color: {favorite_color}")
